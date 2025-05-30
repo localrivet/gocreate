@@ -1,0 +1,2652 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>gocreate: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">gocreate/main.go (0.0%)</option>
+				
+				<option value="file1">gocreate/tools/config/config.go (0.0%)</option>
+				
+				<option value="file2">gocreate/tools/config/get_config.go (0.0%)</option>
+				
+				<option value="file3">gocreate/tools/config/set_config_value.go (0.0%)</option>
+				
+				<option value="file4">gocreate/tools/edit/edit.go (0.0%)</option>
+				
+				<option value="file5">gocreate/tools/edit/precise_edit.go (0.0%)</option>
+				
+				<option value="file6">gocreate/tools/filesystem/create_directory.go (0.0%)</option>
+				
+				<option value="file7">gocreate/tools/filesystem/get_file_info.go (0.0%)</option>
+				
+				<option value="file8">gocreate/tools/filesystem/list_directory.go (0.0%)</option>
+				
+				<option value="file9">gocreate/tools/filesystem/move_file.go (0.0%)</option>
+				
+				<option value="file10">gocreate/tools/filesystem/read_file.go (0.0%)</option>
+				
+				<option value="file11">gocreate/tools/filesystem/read_multiple_files.go (0.0%)</option>
+				
+				<option value="file12">gocreate/tools/filesystem/search_files.go (0.0%)</option>
+				
+				<option value="file13">gocreate/tools/filesystem/write_file.go (0.0%)</option>
+				
+				<option value="file14">gocreate/tools/process/execute_command.go (0.0%)</option>
+				
+				<option value="file15">gocreate/tools/process/kill_process.go (0.0%)</option>
+				
+				<option value="file16">gocreate/tools/process/list_processes.go (0.0%)</option>
+				
+				<option value="file17">gocreate/tools/search/search_code.go (81.9%)</option>
+				
+				<option value="file18">gocreate/tools/search/search_files.go (0.0%)</option>
+				
+				<option value="file19">gocreate/tools/terminal/execute_in_terminal.go (0.0%)</option>
+				
+				<option value="file20">gocreate/tools/terminal/manager.go (0.0%)</option>
+				
+				<option value="file21">gocreate/tools/terminal/terminal.go (0.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package main
+
+import (
+        "log"
+        "log/slog"
+        "os"
+
+        "gocreate/tools/config"
+        "gocreate/tools/edit"
+        "gocreate/tools/filesystem"
+        "gocreate/tools/process"
+        "gocreate/tools/search"
+        "gocreate/tools/terminal"
+
+        "github.com/localrivet/gomcp/server"
+)
+
+func main() <span class="cov0" title="0">{
+        // Create a logger
+        logger := slog.New(slog.NewTextHandler(os.Stdout, &amp;slog.HandlerOptions{
+                Level: slog.LevelError,
+        }))
+
+        // Create a new server
+        s := server.NewServer("GoCreate",
+                server.WithLogger(logger),
+        ).AsStdio()
+
+        // Register tools using the API
+        // Configuration tools
+        s.Tool("get_config", "Get the complete server configuration as JSON.",
+                config.HandleGetConfig)
+
+        s.Tool("set_config_value", "Set a specific configuration value by key.",
+                config.HandleSetConfigValue)
+
+        // Filesystem tools
+        s.Tool("read_file", "Read the contents of a file. Supports optional start_line and end_line parameters for paging.",
+                filesystem.HandleReadFile)
+
+        s.Tool("read_multiple_files", "Read the contents of multiple files simultaneously.",
+                filesystem.HandleReadMultipleFiles)
+
+        s.Tool("write_file", "Completely replace file contents.",
+                filesystem.HandleWriteFile)
+
+        s.Tool("create_directory", "Create a new directory or ensure a directory exists.",
+                filesystem.HandleCreateDirectory)
+
+        s.Tool("list_directory", "Get a detailed listing of all files and directories in a specified path.",
+                filesystem.HandleListDirectory)
+
+        s.Tool("move_file", "Move or rename files and directories.",
+                filesystem.HandleMoveFile)
+
+        s.Tool("search_files", "Finds files by name using a case-insensitive substring matching.",
+                filesystem.HandleSearchFiles)
+
+        s.Tool("get_file_info", "Retrieve detailed metadata about a file or directory.",
+                filesystem.HandleGetFileInfo)
+
+        s.Tool("search_code", "Search for text/code patterns within file contents using pure Go implementation.",
+                search.HandleSearchCode)
+
+        s.Tool("edit_block", "Apply surgical text replacements to files.",
+                edit.HandleEditBlock)
+
+        s.Tool("precise_edit", "Precisely edit file content based on start and end line numbers.",
+                edit.HandlePreciseEdit)
+
+        // Terminal tools
+        s.Tool("execute_command", "Execute a terminal command with timeout.",
+                terminal.HandleExecuteCommand)
+
+        s.Tool("read_output", "Read new output from a running terminal session.",
+                terminal.HandleReadOutput)
+
+        s.Tool("force_terminate", "Force terminate a running terminal session.",
+                terminal.HandleForceTerminate)
+
+        s.Tool("list_sessions", "List all active terminal sessions.",
+                terminal.HandleListSessions)
+
+        s.Tool("execute_in_terminal", "Execute a command in the terminal (client-side execution).",
+                terminal.HandleExecuteInTerminal)
+
+        // Process tools
+        s.Tool("list_processes", "List all running processes.",
+                process.HandleListProcesses)
+
+        s.Tool("kill_process", "Terminate a running process by PID.",
+                process.HandleKillProcess)
+
+        // Start the server
+        logger.Info("Starting GoCreate MCP server...")
+        if err := s.Run(); err != nil </span><span class="cov0" title="0">{
+                log.Fatalf("Server exited with error: %v", err)
+        }</span>
+        <span class="cov0" title="0">logger.Info("Server shutdown complete.")</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package config
+
+import (
+        "encoding/json"
+        "fmt"
+        "os"
+        "path/filepath" // Keep for potential DefaultShell logic later
+        "sync"
+
+        "github.com/localrivet/gomcp/server"
+)
+
+// Path to the configuration file relative to the server executable
+const configDir = "config"
+const configFileName = "config.json"
+
+// Configuration struct to match config.json
+type ServerConfig struct {
+        BlockedCommands    []string `json:"blockedCommands"`
+        DefaultShell       *string  `json:"defaultShell,omitempty"`       // Pointer to distinguish between empty string and not set
+        AllowedDirectories []string `json:"allowedDirectories,omitempty"` // Use omitempty; nil slice means not set, empty slice means allow all
+        TelemetryEnabled   *bool    `json:"telemetryEnabled,omitempty"`   // Pointer for explicit true/false/not set
+}
+
+var currentConfig *ServerConfig
+var loadConfigOnce sync.Once
+var loadConfigErr error
+
+// For testing purposes
+var testConfigDir string
+
+// loadConfig loads the configuration from file or creates default. Used internally.
+func loadConfig(ctx *server.Context) (*ServerConfig, error) <span class="cov0" title="0">{
+        loadConfigOnce.Do(func() </span><span class="cov0" title="0">{
+                configPath, err := getConfigPath()
+                if err != nil </span><span class="cov0" title="0">{
+                        loadConfigErr = fmt.Errorf("failed to get config path: %w", err)
+                        return
+                }</span>
+
+                <span class="cov0" title="0">content, err := os.ReadFile(configPath)
+                if err != nil </span><span class="cov0" title="0">{
+                        if os.IsNotExist(err) </span><span class="cov0" title="0">{
+                                ctx.Logger.Info("Config file not found at %s, creating default for internal use", "configPath", configPath)
+                                cfg := ServerConfig{
+                                        BlockedCommands: defaultBlockedCommands, // Use var from get_config.go
+                                }
+                                // Attempt to write default file, but proceed even if write fails
+                                configJson, marshalErr := json.MarshalIndent(cfg, "", "  ")
+                                if marshalErr == nil </span><span class="cov0" title="0">{
+                                        _ = os.MkdirAll(filepath.Dir(configPath), 0755) // Ignore error
+                                        _ = os.WriteFile(configPath, configJson, 0644)  // Ignore error
+                                }</span> else<span class="cov0" title="0"> {
+                                        ctx.Logger.Info("Error marshalling default config for write", "error", marshalErr)
+                                }</span>
+                                <span class="cov0" title="0">currentConfig = &amp;cfg</span> // Use in-memory default
+                        } else<span class="cov0" title="0"> {
+                                loadConfigErr = fmt.Errorf("error reading config file %s: %w", configPath, err)
+                                return
+                        }</span>
+                } else<span class="cov0" title="0"> {
+                        var cfg ServerConfig
+                        if err := json.Unmarshal(content, &amp;cfg); err != nil </span><span class="cov0" title="0">{
+                                loadConfigErr = fmt.Errorf("error unmarshalling config file %s: %w", configPath, err)
+                                return
+                        }</span>
+                        // Ensure BlockedCommands is not nil if file exists but key is missing
+                        <span class="cov0" title="0">if cfg.BlockedCommands == nil </span><span class="cov0" title="0">{
+                                cfg.BlockedCommands = []string{} // Initialize to empty slice
+                        }</span>
+                        <span class="cov0" title="0">currentConfig = &amp;cfg</span>
+                }
+        })
+        <span class="cov0" title="0">return currentConfig, loadConfigErr</span>
+}
+
+// GetCurrentConfig provides access to the loaded configuration.
+func GetCurrentConfig(ctx *server.Context) (*ServerConfig, error) <span class="cov0" title="0">{
+        return loadConfig(ctx)
+}</span>
+
+// getConfigPath returns the absolute path to the configuration file.
+func getConfigPath() (string, error) <span class="cov0" title="0">{
+        if testConfigDir != "" </span><span class="cov0" title="0">{
+                return filepath.Join(testConfigDir, configFileName), nil
+        }</span>
+
+        <span class="cov0" title="0">exePath, err := os.Executable()
+        if err != nil </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("failed to get executable path: %w", err)
+        }</span>
+        <span class="cov0" title="0">exeDir := filepath.Dir(exePath)
+        return filepath.Join(exeDir, configDir, configFileName), nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package config
+
+import (
+        "encoding/json"
+        "os"
+        "path/filepath"
+
+        "github.com/localrivet/gomcp/server"
+)
+
+// Define default blocked commands (more comprehensive list)
+var defaultBlockedCommands = []string{
+        // File Protection
+        "rm",
+        // Disk/Partition
+        "mkfs", "format", "mount", "umount", "fdisk", "dd", "parted", "diskpart",
+        // System Admin/User
+        "sudo", "su", "passwd", "adduser", "useradd", "usermod", "groupadd", "chsh", "visudo",
+        // System Control
+        "shutdown", "reboot", "halt", "poweroff", "init",
+        // Network/Security
+        "iptables", "firewall", "netsh",
+        // Windows Specific
+        "sfc", "bcdedit", "reg", "net", "sc", "runas", "cipher", "takeown",
+}
+
+// GetConfigArgs defines the arguments for the get_config tool.
+type GetConfigArgs struct{}
+
+// SetConfigValueArgs defines the arguments for the set_config_value tool.
+type SetConfigValueArgs struct {
+        Key   string      `json:"key" description:"The configuration key to set." required:"true"`
+        Value interface{} `json:"value" description:"The value to set for the key." required:"true"`
+}
+
+// HandleGetConfig implements the logic for the get_config tool using the new API.
+func HandleGetConfig(ctx *server.Context, args GetConfigArgs) (string, error) <span class="cov0" title="0">{
+        ctx.Logger.Info("Handling get_config tool call")
+
+        configPath, err := getConfigPath()
+        if err != nil </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Error getting config path", "error", err)
+                return "Error getting configuration file path", err
+        }</span>
+
+        // Read the config file
+        <span class="cov0" title="0">content, err := os.ReadFile(configPath)
+        if err != nil </span><span class="cov0" title="0">{
+                // If the file doesn't exist, create it with default BlockedCommands and return that
+                if os.IsNotExist(err) </span><span class="cov0" title="0">{
+                        ctx.Logger.Info("Config file not found at %s, creating with default BlockedCommands", "configPath", configPath)
+                        // Only set BlockedCommands in the default config written to file
+                        defaultConfig := ServerConfig{
+                                BlockedCommands: defaultBlockedCommands,
+                                // DefaultShell, AllowedDirectories, TelemetryEnabled remain nil/zero
+                        }
+                        configJson, marshalErr := json.MarshalIndent(defaultConfig, "", "  ")
+                        if marshalErr != nil </span><span class="cov0" title="0">{
+                                ctx.Logger.Info("Error marshalling default config", "error", marshalErr)
+                                return "Error generating default config output", marshalErr
+                        }</span>
+
+                        // Create the config directory if it doesn't exist
+                        <span class="cov0" title="0">configDirPath := filepath.Join(filepath.Dir(configPath))
+                        if err := os.MkdirAll(configDirPath, 0755); err != nil </span><span class="cov0" title="0">{
+                                ctx.Logger.Info("Error creating config directory", "configDirPath", configDirPath, "error", err)
+                                return "Error creating configuration directory", err
+                        }</span>
+
+                        <span class="cov0" title="0">if writeErr := os.WriteFile(configPath, configJson, 0644); writeErr != nil </span><span class="cov0" title="0">{
+                                ctx.Logger.Info("Error writing default config file", "configPath", configPath, "error", writeErr)
+                                return "Error writing default configuration file", writeErr
+                        }</span>
+
+                        <span class="cov0" title="0">return string(configJson), nil</span>
+                }
+                <span class="cov0" title="0">ctx.Logger.Info("Error reading config file", "configPath", configPath, "error", err)
+                return "Error reading configuration file", err</span>
+        }
+
+        <span class="cov0" title="0">var config ServerConfig
+        if err := json.Unmarshal(content, &amp;config); err != nil </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Error unmarshalling config file", "configPath", configPath, "error", err)
+                return "Error parsing configuration file", err
+        }</span>
+
+        <span class="cov0" title="0">configJson, err := json.MarshalIndent(config, "", "  ")
+        if err != nil </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Error marshalling config", "error", err)
+                return "Error generating config output", err
+        }</span>
+
+        <span class="cov0" title="0">return string(configJson), nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package config
+
+import (
+        "encoding/json"
+        "os"
+
+        "github.com/localrivet/gomcp/server"
+)
+
+// HandleSetConfigValue implements the set_config_value tool using the new API
+func HandleSetConfigValue(ctx *server.Context, args SetConfigValueArgs) (string, error) <span class="cov0" title="0">{
+        ctx.Logger.Info("Handling set_config_value tool call")
+
+        configPath, err := getConfigPath()
+        if err != nil </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Error getting config path", "error", err)
+                return "Error getting configuration file path", err
+        }</span>
+
+        // Read the current config
+        <span class="cov0" title="0">content, err := os.ReadFile(configPath)
+        if err != nil </span><span class="cov0" title="0">{
+                // If the file doesn't exist, start with a default empty config
+                if os.IsNotExist(err) </span><span class="cov0" title="0">{
+                        ctx.Logger.Info("Config file not found, starting with default empty config for set operation", "configPath", configPath)
+                        content = []byte("{}") // Start with an empty JSON object
+                }</span> else<span class="cov0" title="0"> {
+                        ctx.Logger.Info("Error reading config file for set_config_value", "configPath", configPath, "error", err)
+                        return "Error reading configuration file for update", err
+                }</span>
+        }
+
+        <span class="cov0" title="0">var config map[string]interface{} // Use a map to handle arbitrary keys
+        if err := json.Unmarshal(content, &amp;config); err != nil </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Error unmarshalling config file for set_config_value", "configPath", configPath, "error", err)
+                return "Error parsing configuration file for update", err
+        }</span>
+
+        // Update the specific key
+        <span class="cov0" title="0">config[args.Key] = args.Value
+
+        // Marshal the updated config
+        updatedConfigJson, err := json.MarshalIndent(config, "", "  ")
+        if err != nil </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Error marshalling updated config", "error", err)
+                return "Error generating updated config", err
+        }</span>
+
+        // Write the updated config back to the file
+        <span class="cov0" title="0">if err := os.WriteFile(configPath, updatedConfigJson, 0644); err != nil </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Error writing updated config file", "configPath", configPath, "error", err)
+                return "Error writing configuration file", err
+        }</span>
+
+        <span class="cov0" title="0">ctx.Logger.Info("Configuration value set successfully", "key", args.Key)
+        return "Configuration value set successfully.", nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package edit
+
+import (
+        "fmt"
+        "os"
+        "strings"
+
+        "github.com/localrivet/gomcp/server"
+        "github.com/sergi/go-diff/diffmatchpatch"
+)
+
+const maxEditFileSize = 100 * 1024 * 1024 // 100 MB limit
+
+// Go structs for tool arguments
+type EditBlockArgs struct {
+        FilePath             string `json:"file_path" description:"The path to the file to edit." required:"true"`
+        OldString            string `json:"old_string" description:"The exact block of text to find and replace." required:"true"`
+        NewString            string `json:"new_string" description:"The new block of text to insert." required:"true"`
+        ExpectedReplacements *int   `json:"expected_replacements,omitempty" description:"Optional. If provided, the exact number of replacements expected. Defaults to 1."`
+}
+
+// HandleEditBlock implements the edit_block tool using the new API
+func HandleEditBlock(ctx *server.Context, args EditBlockArgs) (string, error) <span class="cov0" title="0">{
+        ctx.Logger.Info("Handling edit_block tool call")
+
+        // --- File Size Check ---
+        fileInfo, err := os.Stat(args.FilePath)
+        if err != nil </span><span class="cov0" title="0">{
+                // Handle file not found or other stat errors
+                if os.IsNotExist(err) </span><span class="cov0" title="0">{
+                        ctx.Logger.Info("File not found", "filePath", args.FilePath)
+                        return "Error: File not found.", err
+                }</span>
+                <span class="cov0" title="0">ctx.Logger.Info("Error getting file info", "filePath", args.FilePath, "error", err)
+                return "Error accessing file information.", err</span>
+        }
+
+        <span class="cov0" title="0">if fileInfo.Size() &gt; maxEditFileSize </span><span class="cov0" title="0">{
+                errorMsg := fmt.Sprintf("Error: File size (%d bytes) exceeds the %d MB limit for this editing tool due to memory constraints. Please use a different tool or method for editing very large files. If this is a source code file, consider splitting it into smaller modules/files if appropriate for the language.", fileInfo.Size(), maxEditFileSize/(1024*1024))
+                ctx.Logger.Info(errorMsg)
+                return errorMsg, nil
+        }</span>
+        // --- End File Size Check ---
+
+        // Read the file (now known to be within size limit)
+        <span class="cov0" title="0">content, err := os.ReadFile(args.FilePath)
+        if err != nil </span><span class="cov0" title="0">{
+                // This error should be less likely now after Stat, but handle anyway
+                ctx.Logger.Info("Error reading file", "filePath", args.FilePath, "error", err)
+                return "Error reading file for editing", err
+        }</span>
+
+        <span class="cov0" title="0">originalContent := string(content)
+        var modifiedContent string
+
+        // --- Perform Context-Aware Replacement ---
+        replacementsMade := 0
+        expected := 1 // Default expectation
+
+        if args.ExpectedReplacements != nil </span><span class="cov0" title="0">{
+                expected = *args.ExpectedReplacements
+                if expected &lt;= 0 </span><span class="cov0" title="0">{
+                        return "expected_replacements must be positive", nil
+                }</span>
+                // --- Handle Multiple Replacements (Using strings.Replace for now) ---
+                <span class="cov0" title="0">actualOccurrences := strings.Count(originalContent, args.OldString)
+                if actualOccurrences &lt; expected </span><span class="cov0" title="0">{
+                        msg := fmt.Sprintf("Expected %d replacements, but only found %d occurrences of the old string.", expected, actualOccurrences)
+                        ctx.Logger.Info(msg, "filePath", args.FilePath)
+                        return msg, nil
+                }</span>
+                <span class="cov0" title="0">modifiedContent = strings.Replace(originalContent, args.OldString, args.NewString, expected)
+                if modifiedContent == originalContent &amp;&amp; expected &gt; 0 &amp;&amp; actualOccurrences &gt; 0 </span><span class="cov0" title="0">{
+                        msg := fmt.Sprintf("Replacement failed unexpectedly for %d expected replacements despite %d occurrences.", expected, actualOccurrences)
+                        ctx.Logger.Info(msg, "filePath", args.FilePath)
+                        return msg, nil
+                }</span>
+                <span class="cov0" title="0">replacementsMade = expected</span>
+        } else<span class="cov0" title="0"> {
+                // --- Handle Single Replacement (Default) ---
+                index := strings.Index(originalContent, args.OldString)
+
+                if index == -1 </span><span class="cov0" title="0">{
+                        // Old string not found, generate near-miss diff if possible
+                        ctx.Logger.Info("Old string block not found in file", "filePath", args.FilePath)
+
+                        // --- Generate Diff for Near Miss ---
+                        dmp := diffmatchpatch.New()
+                        bestMatchIndex := dmp.MatchMain(originalContent, args.OldString, 0)
+
+                        var errorMsg string
+                        if bestMatchIndex != -1 </span><span class="cov0" title="0">{
+                                // Found a potential near miss location
+                                endIndex := bestMatchIndex + len(args.OldString)
+                                if endIndex &gt; len(originalContent) </span><span class="cov0" title="0">{
+                                        endIndex = len(originalContent)
+                                }</span>
+                                <span class="cov0" title="0">closestMatchBlock := originalContent[bestMatchIndex:endIndex]
+
+                                // Generate diff between expected OldString and the actual block found
+                                diffs := dmp.DiffMain(args.OldString, closestMatchBlock, false)
+                                diffText := dmp.DiffPrettyText(diffs)
+                                diffText = strings.ReplaceAll(diffText, "\\n", "\n")
+                                diffText = strings.ReplaceAll(diffText, "%", "%%")
+                                errorMsg = fmt.Sprintf("Failed to apply edit. Found a potential match near character %d with differences:\n---\n%s\n---", bestMatchIndex, diffText)
+                                ctx.Logger.Info("Near miss found for edit_block", "filePath", args.FilePath)</span>
+
+                        } else<span class="cov0" title="0"> {
+                                // Couldn't find a reasonable match, just show the expected block
+                                ctx.Logger.Info("Near miss check failed to find any likely match for edit_block", "filePath", args.FilePath)
+                                diffsNotFound := dmp.DiffMain(args.OldString, "", false)
+                                diffText := dmp.DiffPrettyText(diffsNotFound)
+                                diffText = strings.ReplaceAll(diffText, "\\n", "\n")
+                                diffText = strings.ReplaceAll(diffText, "%", "%%")
+                                errorMsg = fmt.Sprintf("Failed to apply edit. Old string block not found/matched exactly. Expected block looked like:\n---\n%s\n---", diffText)
+                        }</span>
+                        <span class="cov0" title="0">return errorMsg, nil</span>
+
+                } else<span class="cov0" title="0"> {
+                        // Old string found, perform the replacement
+                        modifiedContent = originalContent[:index] + args.NewString + originalContent[index+len(args.OldString):]
+                        replacementsMade = 1
+                }</span>
+        }
+
+        // This check is slightly redundant now but kept as a safeguard
+        <span class="cov0" title="0">if replacementsMade == 0 &amp;&amp; expected &gt; 0 </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Replacement logic failed unexpectedly", "filePath", args.FilePath)
+                return "Internal error during replacement.", nil
+        }</span>
+
+        // Write the modified content back to the file
+        <span class="cov0" title="0">if err := os.WriteFile(args.FilePath, []byte(modifiedContent), 0644); err != nil </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Error writing file after edit_block", "filePath", args.FilePath, "error", err)
+                return "Error writing file after editing", err
+        }</span>
+
+        <span class="cov0" title="0">return "File edited successfully.", nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package edit
+
+import (
+        "fmt"
+        "os"
+        "strings"
+
+        "github.com/localrivet/gomcp/server"
+)
+
+// const maxEditFileSize = 100 * 1024 * 1024 // Defined in edit.go
+
+// Go structs for tool arguments - Updated for line-based editing
+type PreciseEditArgs struct {
+        FilePath   string `json:"file_path" description:"The path to the file to edit." required:"true"`
+        StartLine  int    `json:"start_line" description:"The 1-indexed line number where the edit begins (inclusive)." required:"true"`
+        EndLine    int    `json:"end_line" description:"The 1-indexed line number where the block to be replaced ends (inclusive). For insertion before start_line, use end_line = start_line - 1." required:"true"`
+        NewContent string `json:"new_content" description:"The new content (potentially multi-line) to insert or replace the specified lines with." required:"true"`
+}
+
+// HandlePreciseEdit performs line-based editing on a file using the new API
+func HandlePreciseEdit(ctx *server.Context, args PreciseEditArgs) (string, error) <span class="cov0" title="0">{
+        ctx.Logger.Info("Handling precise_edit tool call (line-based editing, in-memory)")
+
+        // --- Input Validation ---
+        if args.StartLine &lt;= 0 </span><span class="cov0" title="0">{
+                msg := "start_line must be positive and 1-indexed"
+                ctx.Logger.Info(msg)
+                return msg, nil
+        }</span>
+        // Allow end_line to be start_line - 1 for insertion
+        <span class="cov0" title="0">if args.EndLine &lt; args.StartLine-1 </span><span class="cov0" title="0">{
+                msg := "end_line cannot be less than start_line - 1"
+                ctx.Logger.Info(msg)
+                return msg, nil
+        }</span>
+
+        // --- File Size Check ---
+        <span class="cov0" title="0">fileInfo, err := os.Stat(args.FilePath)
+        fileExists := !os.IsNotExist(err)
+
+        if err != nil &amp;&amp; fileExists </span><span class="cov0" title="0">{ // Handle stat errors only if file exists
+                ctx.Logger.Info("Error getting file info", "filePath", args.FilePath, "error", err)
+                return "Error accessing file information.", err
+        }</span>
+
+        // Allow file not found only if inserting at the beginning of a new file
+        <span class="cov0" title="0">if !fileExists &amp;&amp; !(args.StartLine == 1 &amp;&amp; args.EndLine == 0) </span><span class="cov0" title="0">{
+                ctx.Logger.Info("File does not exist and cannot perform edit", "filePath", args.FilePath)
+                return "Error: File not found.", nil
+        }</span>
+
+        // Check size only if the file exists
+        <span class="cov0" title="0">if fileExists &amp;&amp; fileInfo.Size() &gt; maxEditFileSize </span><span class="cov0" title="0">{
+                errorMsg := fmt.Sprintf("Error: File size (%d bytes) exceeds the %d MB limit for this editing tool due to memory constraints. Please use a different tool or method for editing very large files. If this is a source code file, consider splitting it into smaller modules/files if appropriate for the language.", fileInfo.Size(), maxEditFileSize/(1024*1024))
+                ctx.Logger.Info(errorMsg)
+                return errorMsg, nil
+        }</span>
+        // --- End File Size Check ---
+
+        // --- Read File ---
+        <span class="cov0" title="0">var contentBytes []byte
+        if fileExists </span><span class="cov0" title="0">{
+                contentBytes, err = os.ReadFile(args.FilePath)
+                if err != nil </span><span class="cov0" title="0">{
+                        // This error should be less likely now after Stat, but handle anyway
+                        ctx.Logger.Info("Error reading file for precise_edit", "filePath", args.FilePath, "error", err)
+                        return "Error reading file for patching", err
+                }</span>
+        } else<span class="cov0" title="0"> {
+                // File doesn't exist, but we are inserting at start
+                ctx.Logger.Info("File does not exist, creating new file for insertion", "filePath", args.FilePath)
+                contentBytes = []byte{} // Start with empty content
+        }</span>
+
+        <span class="cov0" title="0">originalContent := string(contentBytes)
+        // Detect line endings, default to \n
+        lineEnding := "\n"
+        if strings.Contains(originalContent, "\r\n") </span><span class="cov0" title="0">{
+                lineEnding = "\r\n"
+        }</span>
+        <span class="cov0" title="0">lines := strings.Split(originalContent, lineEnding)
+
+        // Handle potential trailing newline splitting issue
+        // If the file ends with a newline, Split leaves an empty string at the end.
+        if len(originalContent) &gt; 0 &amp;&amp; strings.HasSuffix(originalContent, lineEnding) &amp;&amp; len(lines) &gt; 0 </span><span class="cov0" title="0">{
+                // Keep the empty string unless the file was *only* the line ending(s)
+                if len(lines) == 1 &amp;&amp; lines[0] == "" </span><span class="cov0" title="0">{
+                        lines = []string{""} // File was empty or just newline(s)
+                }</span>
+                // Otherwise, the empty string from split is handled correctly by len(lines) below
+        } else<span class="cov0" title="0"> if originalContent == "" </span><span class="cov0" title="0">{
+                lines = []string{} // If the original file was completely empty
+        }</span>
+
+        <span class="cov0" title="0">numLines := len(lines)
+        // Correct numLines if the split resulted in [""] for an empty file
+        if numLines == 1 &amp;&amp; lines[0] == "" </span><span class="cov0" title="0">{
+                numLines = 0
+        }</span>
+
+        // --- Line Number Validation ---
+        // Allow insertion *after* the last line
+        <span class="cov0" title="0">if args.StartLine &gt; numLines+1 </span><span class="cov0" title="0">{
+                msg := fmt.Sprintf("start_line (%d) exceeds the number of lines (%d) + 1", args.StartLine, numLines)
+                ctx.Logger.Info(msg)
+                return msg, nil
+        }</span>
+        // EndLine must be within bounds or StartLine-1 for insertion
+        <span class="cov0" title="0">if args.EndLine &gt; numLines || args.EndLine &lt; args.StartLine-1 </span><span class="cov0" title="0">{
+                if !(args.EndLine == 0 &amp;&amp; args.StartLine == 1 &amp;&amp; numLines == 0) </span><span class="cov0" title="0">{ // Allow insert into empty file
+                        msg := fmt.Sprintf("end_line (%d) is out of bounds [0..%d] or invalid relative to start_line (%d)", args.EndLine, numLines, args.StartLine)
+                        ctx.Logger.Info(msg)
+                        return msg, nil
+                }</span>
+        }
+
+        // --- Construct New Content ---
+        <span class="cov0" title="0">var newLines []string
+
+        // 1. Add lines before the start line (adjust index to 0-based)
+        startIdx := args.StartLine - 1
+        if startIdx &gt; 0 &amp;&amp; startIdx &lt;= numLines </span><span class="cov0" title="0">{ // Ensure startIdx is valid
+                newLines = append(newLines, lines[0:startIdx]...)
+        }</span>
+
+        // 2. Add the new content (split if multi-line)
+        <span class="cov0" title="0">if args.NewContent != "" </span><span class="cov0" title="0">{
+                // Use the detected line ending for splitting NewContent as well
+                newContentLines := strings.Split(args.NewContent, lineEnding)
+                // Handle potential trailing newline in NewContent causing extra empty string
+                if len(args.NewContent) &gt; 0 &amp;&amp; strings.HasSuffix(args.NewContent, lineEnding) &amp;&amp; len(newContentLines) &gt; 0 </span><span class="cov0" title="0">{
+                        // If NewContent ends with newline, Split adds an empty string. We usually want that empty string
+                        // to represent the line break *after* the last line of actual content.
+                        newLines = append(newLines, newContentLines...)
+                }</span> else<span class="cov0" title="0"> {
+                        newLines = append(newLines, newContentLines...)
+                }</span>
+        }
+
+        // 3. Add lines after the end line (adjust index to 0-based)
+        // endIdx is the line number *after* the last line to be replaced/skipped
+        <span class="cov0" title="0">endIdx := args.EndLine + 1
+        if endIdx &lt;= numLines </span><span class="cov0" title="0">{ // Check if endIdx is within the bounds of original lines
+                newLines = append(newLines, lines[endIdx-1:]...) // Add from the line *after* EndLine
+        }</span>
+
+        // --- Write File ---
+        // Join lines with the original line ending
+        <span class="cov0" title="0">finalContent := strings.Join(newLines, lineEnding)
+        // Ensure trailing newline if the original had one and the edit didn't remove the last line
+        // Or if the original was empty and new content was added.
+        if (len(originalContent) &gt; 0 &amp;&amp; strings.HasSuffix(originalContent, lineEnding) &amp;&amp; endIdx &lt;= numLines) ||
+                (len(originalContent) == 0 &amp;&amp; len(finalContent) &gt; 0) </span><span class="cov0" title="0">{
+                if !strings.HasSuffix(finalContent, lineEnding) </span><span class="cov0" title="0">{
+                        finalContent += lineEnding
+                }</span>
+        }
+
+        // Get original file info for permissions
+        <span class="cov0" title="0">fileMode := os.FileMode(0644) // Default permission
+        if fileExists </span><span class="cov0" title="0">{
+                fileInfo, infoErr := os.Stat(args.FilePath)
+                if infoErr == nil </span><span class="cov0" title="0">{
+                        fileMode = fileInfo.Mode()
+                }</span> else<span class="cov0" title="0"> { // Log if error is something other than NotExist (already handled)
+                        ctx.Logger.Info("Warning: Could not get file info, using default permissions", "filePath", args.FilePath, "error", infoErr)
+                }</span>
+        }
+
+        // Write the patched content back to the original file path (truncates existing)
+        <span class="cov0" title="0">if err := os.WriteFile(args.FilePath, []byte(finalContent), fileMode); err != nil </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Error writing patched file", "filePath", args.FilePath, "error", err)
+                return "Error writing patched file", err
+        }</span>
+
+        <span class="cov0" title="0">ctx.Logger.Info("File edited successfully using precise_edit (in-memory)", "filePath", args.FilePath)
+        return "File edited successfully.", nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package filesystem
+
+import (
+        "os"
+
+        "github.com/localrivet/gomcp/server"
+)
+
+// CreateDirectoryArgs defines the arguments for the create_directory tool.
+type CreateDirectoryArgs struct {
+        Path string `json:"path" description:"The path of the directory to create." required:"true"`
+}
+
+// HandleCreateDirectory implements the logic for the create_directory tool using the new API.
+func HandleCreateDirectory(ctx *server.Context, args CreateDirectoryArgs) (string, error) <span class="cov0" title="0">{
+        ctx.Logger.Info("Handling create_directory tool call")
+
+        // Create the directory and any necessary parent directories. 0755 is a common permission for directories.
+        if err := os.MkdirAll(args.Path, 0755); err != nil </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Error creating directory", "path", args.Path, "error", err)
+                return "Error creating directory", err
+        }</span>
+
+        <span class="cov0" title="0">return "Directory created successfully.", nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package filesystem
+
+import (
+        "encoding/json"
+        "os"
+        "time"
+
+        "github.com/localrivet/gomcp/server"
+)
+
+// GetFileInfoArgs defines the arguments for the get_file_info tool.
+type GetFileInfoArgs struct {
+        Path string `json:"path" description:"The path of the file or directory to get information for." required:"true"`
+}
+
+// HandleGetFileInfo implements the get_file_info tool using the new API
+func HandleGetFileInfo(ctx *server.Context, args GetFileInfoArgs) (string, error) <span class="cov0" title="0">{
+        ctx.Logger.Info("Handling get_file_info tool call")
+
+        fileInfo, err := os.Stat(args.Path)
+        if err != nil </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Error getting file info", "path", args.Path, "error", err)
+                return "Error getting file info", err
+        }</span>
+
+        // Format the file info
+        <span class="cov0" title="0">info := map[string]interface{}{
+                "name":     fileInfo.Name(),
+                "size":     fileInfo.Size(),
+                "is_dir":   fileInfo.IsDir(),
+                "mode":     fileInfo.Mode().String(),
+                "mod_time": fileInfo.ModTime().Format(time.RFC3339),
+        }
+
+        // Marshal the file info into JSON
+        infoJson, marshalErr := json.MarshalIndent(info, "", "  ")
+        if marshalErr != nil </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Error marshalling file info", "error", marshalErr)
+                return "Error generating file info output", marshalErr
+        }</span>
+
+        <span class="cov0" title="0">return string(infoJson), nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">package filesystem
+
+import (
+        "encoding/json"
+        "os"
+
+        "github.com/localrivet/gomcp/server"
+)
+
+// ListDirectoryArgs defines the arguments for the list_directory tool.
+type ListDirectoryArgs struct {
+        Path string `json:"path" description:"The path of the directory to list." required:"true"`
+}
+
+// HandleListDirectory implements the list_directory tool using the new API
+func HandleListDirectory(ctx *server.Context, args ListDirectoryArgs) (string, error) <span class="cov0" title="0">{
+        ctx.Logger.Info("Handling list_directory tool call")
+
+        files, err := os.ReadDir(args.Path)
+        if err != nil </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Error reading directory", "path", args.Path, "error", err)
+                return "Error reading directory", err
+        }</span>
+
+        <span class="cov0" title="0">var fileList []string
+        for _, file := range files </span><span class="cov0" title="0">{
+                fileType := "[FILE]"
+                if file.IsDir() </span><span class="cov0" title="0">{
+                        fileType = "[DIR]"
+                }</span>
+                <span class="cov0" title="0">fileList = append(fileList, fileType+" "+file.Name())</span>
+        }
+
+        // Marshal the file list into JSON
+        <span class="cov0" title="0">fileListJson, err := json.MarshalIndent(fileList, "", "  ")
+        if err != nil </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Error marshalling file list for list_directory", "error", err)
+                return "Error generating file list output", err
+        }</span>
+
+        <span class="cov0" title="0">return string(fileListJson), nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">package filesystem
+
+import (
+        "os"
+
+        "github.com/localrivet/gomcp/server"
+)
+
+// MoveFileArgs defines the arguments for the move_file tool.
+type MoveFileArgs struct {
+        Source      string `json:"source" description:"The source path of the file or directory." required:"true"`
+        Destination string `json:"destination" description:"The destination path for the file or directory." required:"true"`
+}
+
+// HandleMoveFile implements the move_file tool using the new API
+func HandleMoveFile(ctx *server.Context, args MoveFileArgs) (string, error) <span class="cov0" title="0">{
+        ctx.Logger.Info("Handling move_file tool call")
+
+        // Perform the move/rename operation
+        if err := os.Rename(args.Source, args.Destination); err != nil </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Error moving/renaming file", "source", args.Source, "destination", args.Destination, "error", err)
+                return "Error moving/renaming file", err
+        }</span>
+
+        <span class="cov0" title="0">return "File moved/renamed successfully.", nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file10" style="display: none">package filesystem
+
+import (
+        "fmt"
+        "os"
+        "strings"
+
+        "github.com/localrivet/gomcp/server"
+)
+
+// Go structs for tool arguments
+type ReadFileArgs struct {
+        FilePath  string `json:"file_path" description:"The path to the file to read." required:"true"`
+        StartLine *int   `json:"start_line,omitempty" description:"Optional starting line number (1-indexed) for paging."`
+        EndLine   *int   `json:"end_line,omitempty" description:"Optional ending line number (1-indexed, inclusive) for paging."`
+}
+
+// HandleReadFile implements the read_file tool using the new API
+func HandleReadFile(ctx *server.Context, args ReadFileArgs) (string, error) <span class="cov0" title="0">{
+        ctx.Logger.Info("Handling read_file tool call")
+
+        // Read the file
+        content, err := os.ReadFile(args.FilePath)
+        if err != nil </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Error reading file", "file_path", args.FilePath, "error", err)
+                return "Error reading file", err
+        }</span>
+
+        <span class="cov0" title="0">fileContent := string(content)
+
+        // If no line range specified, return the entire file
+        if args.StartLine == nil &amp;&amp; args.EndLine == nil </span><span class="cov0" title="0">{
+                return fileContent, nil
+        }</span>
+
+        // Handle line-based paging
+        <span class="cov0" title="0">lines := strings.Split(fileContent, "\n")
+        totalLines := len(lines)
+
+        startLine := 1
+        if args.StartLine != nil </span><span class="cov0" title="0">{
+                startLine = *args.StartLine
+        }</span>
+
+        <span class="cov0" title="0">endLine := totalLines
+        if args.EndLine != nil </span><span class="cov0" title="0">{
+                endLine = *args.EndLine
+        }</span>
+
+        // Validate line numbers
+        <span class="cov0" title="0">if startLine &lt; 1 </span><span class="cov0" title="0">{
+                startLine = 1
+        }</span>
+        <span class="cov0" title="0">if endLine &gt; totalLines </span><span class="cov0" title="0">{
+                endLine = totalLines
+        }</span>
+        <span class="cov0" title="0">if startLine &gt; endLine </span><span class="cov0" title="0">{
+                return "Invalid line range: start_line must be &lt;= end_line", nil
+        }</span>
+
+        // Extract the requested lines (convert to 0-based indexing)
+        <span class="cov0" title="0">selectedLines := lines[startLine-1 : endLine]
+        result := strings.Join(selectedLines, "\n")
+
+        // Add line number information
+        info := fmt.Sprintf("Lines %d-%d of %d total lines:\n%s", startLine, endLine, totalLines, result)
+        return info, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file11" style="display: none">package filesystem
+
+import (
+        "encoding/json"
+        "os"
+
+        "github.com/localrivet/gomcp/server"
+)
+
+// ReadMultipleFilesArgs defines the arguments for the read_multiple_files tool.
+type ReadMultipleFilesArgs struct {
+        Paths []string `json:"paths" description:"An array of file paths to read." required:"true"`
+}
+
+// HandleReadMultipleFiles implements the read_multiple_files tool using the new API
+func HandleReadMultipleFiles(ctx *server.Context, args ReadMultipleFilesArgs) (string, error) <span class="cov0" title="0">{
+        ctx.Logger.Info("Handling read_multiple_files tool call")
+
+        results := make(map[string]string)
+
+        for _, path := range args.Paths </span><span class="cov0" title="0">{
+                content, err := os.ReadFile(path)
+                if err != nil </span><span class="cov0" title="0">{
+                        ctx.Logger.Info("Error reading file", "path", path, "error", err)
+                        results[path] = "Error reading file: " + err.Error()
+                }</span> else<span class="cov0" title="0"> {
+                        results[path] = string(content)
+                }</span>
+        }
+
+        // Marshal the results into JSON
+        <span class="cov0" title="0">resultsJson, err := json.MarshalIndent(results, "", "  ")
+        if err != nil </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Error marshalling results for read_multiple_files", "error", err)
+                return "Error generating results output", err
+        }</span>
+
+        <span class="cov0" title="0">return string(resultsJson), nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file12" style="display: none">package filesystem
+
+import (
+        "context"
+        "encoding/json"
+        "os"
+        "path/filepath"
+        "strings"
+        "time"
+
+        "github.com/localrivet/gomcp/server"
+)
+
+// SearchFilesArgs defines the arguments for the search_files tool.
+type SearchFilesArgs struct {
+        Path      string `json:"path" description:"The directory path to search in." required:"true"`
+        Pattern   string `json:"pattern" description:"The case-insensitive substring pattern to search for in file names." required:"true"`
+        TimeoutMs *int   `json:"timeoutMs,omitempty" description:"Optional timeout in milliseconds for the search."`
+}
+
+// HandleSearchFiles implements the search_files tool using the new API
+func HandleSearchFiles(ctx *server.Context, args SearchFilesArgs) (string, error) <span class="cov0" title="0">{
+        ctx.Logger.Info("Handling search_files tool call")
+
+        var foundFiles []string
+
+        // Set up context with timeout
+        searchCtx := context.Background()
+        if args.TimeoutMs != nil &amp;&amp; *args.TimeoutMs &gt; 0 </span><span class="cov0" title="0">{
+                var cancel context.CancelFunc
+                searchCtx, cancel = context.WithTimeout(context.Background(), time.Duration(*args.TimeoutMs)*time.Millisecond)
+                defer cancel()
+        }</span>
+
+        // Walk the directory tree
+        <span class="cov0" title="0">err := filepath.WalkDir(args.Path, func(path string, d os.DirEntry, err error) error </span><span class="cov0" title="0">{
+                // Check for context cancellation
+                select </span>{
+                case &lt;-searchCtx.Done():<span class="cov0" title="0">
+                        ctx.Logger.Info("Search timed out or cancelled")
+                        return searchCtx.Err()</span>
+                default:<span class="cov0" title="0"></span>
+                        // Continue
+                }
+
+                <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                        ctx.Logger.Info("Error accessing path", "path", path, "error", err)
+                        return nil // Don't stop the walk for individual errors
+                }</span>
+
+                // Skip directories themselves, we only care about files matching the pattern
+                <span class="cov0" title="0">if d.IsDir() </span><span class="cov0" title="0">{
+                        return nil
+                }</span>
+
+                // Perform case-insensitive substring match on the file name
+                <span class="cov0" title="0">if strings.Contains(strings.ToLower(d.Name()), strings.ToLower(args.Pattern)) </span><span class="cov0" title="0">{
+                        foundFiles = append(foundFiles, path)
+                }</span>
+
+                <span class="cov0" title="0">return nil</span>
+        })
+
+        <span class="cov0" title="0">if err != nil &amp;&amp; err != context.Canceled &amp;&amp; err != context.DeadlineExceeded </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Error during directory walk for search_files", "error", err)
+                return "Error during file search", err
+        }</span>
+
+        // Marshal the found files list into JSON
+        <span class="cov0" title="0">foundFilesJson, marshalErr := json.MarshalIndent(foundFiles, "", "  ")
+        if marshalErr != nil </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Error marshalling found files for search_files", "error", marshalErr)
+                return "Error generating search results output", marshalErr
+        }</span>
+
+        // If the context was cancelled due to timeout, indicate an error
+        <span class="cov0" title="0">if searchCtx.Err() != nil </span><span class="cov0" title="0">{
+                return "Search timed out.", nil
+        }</span>
+
+        <span class="cov0" title="0">return string(foundFilesJson), nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file13" style="display: none">package filesystem
+
+import (
+        "os"
+
+        "github.com/localrivet/gomcp/server"
+)
+
+// WriteFileArgs defines the arguments for the write_file tool.
+type WriteFileArgs struct {
+        Path    string `json:"path" description:"The path of the file to write to." required:"true"`
+        Content string `json:"content" description:"The content to write to the file." required:"true"`
+}
+
+// HandleWriteFile implements the write_file tool using the new API
+func HandleWriteFile(ctx *server.Context, args WriteFileArgs) (string, error) <span class="cov0" title="0">{
+        ctx.Logger.Info("Handling write_file tool call")
+
+        // Write the content to the file. 0644 is a common permission for files.
+        if err := os.WriteFile(args.Path, []byte(args.Content), 0644); err != nil </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Error writing file", "path", args.Path, "error", err)
+                return "Error writing file", err
+        }</span>
+
+        <span class="cov0" title="0">return "File written successfully.", nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file14" style="display: none">package process
+
+import (
+        "context"
+        "os/exec"
+        "strings"
+
+        "github.com/localrivet/gomcp/server"
+)
+
+// ExecuteCommandArgs defines the arguments for the execute_command tool.
+type ExecuteCommandArgs struct {
+        Command string `json:"command" description:"The command to execute." required:"true"`
+        Cwd     string `json:"cwd,omitempty" description:"The working directory for the command. Defaults to the server's current working directory."`
+}
+
+// ListProcessesArgs defines the arguments for the list_processes tool.
+type ListProcessesArgs struct{}
+
+// KillProcessArgs defines the arguments for the kill_process tool.
+type KillProcessArgs struct {
+        Pid int `json:"pid" description:"The process ID to terminate." required:"true"`
+}
+
+// HandleExecuteCommandNew implements the execute_command tool using the new API
+func HandleExecuteCommandNew(ctx *server.Context, args ExecuteCommandArgs) (string, error) <span class="cov0" title="0">{
+        ctx.Logger.Info("Handling execute_command tool call")
+
+        // Basic sanitization: prevent execution of potentially harmful commands
+        blockedCommands := []string{"rm ", "format ", "mount ", "umount ", "mkfs ", "fdisk ", "dd ", "sudo ", "su ", "passwd ", "adduser ", "useradd ", "usermod ", "groupadd "}
+        commandLower := strings.ToLower(args.Command)
+        for _, blocked := range blockedCommands </span><span class="cov0" title="0">{
+                if strings.Contains(commandLower, blocked) </span><span class="cov0" title="0">{
+                        ctx.Logger.Info("Blocked command execution attempt", "command", args.Command)
+                        return "Error: Execution of this command is blocked for security reasons.", nil
+                }</span>
+        }
+
+        // Execute the command
+        <span class="cov0" title="0">cmd := exec.CommandContext(context.Background(), "/bin/sh", "-c", args.Command)
+        if args.Cwd != "" </span><span class="cov0" title="0">{
+                cmd.Dir = args.Cwd
+        }</span>
+
+        <span class="cov0" title="0">output, err := cmd.CombinedOutput()
+        if err != nil </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Error executing command", "command", args.Command, "error", err, "output", string(output))
+                return "Error executing command:\n" + string(output), err
+        }</span>
+
+        <span class="cov0" title="0">ctx.Logger.Info("Command executed successfully", "command", args.Command, "output", string(output))
+        return string(output), nil</span>
+}
+
+// Legacy handler - keeping for backward compatibility but not used with new API
+func HandleExecuteCommand(ctx context.Context, progressToken interface{}, arguments any) ([]interface{}, bool) <span class="cov0" title="0">{
+        // Legacy implementation - not used with new API
+        return []interface{}{"Legacy handler not implemented"}, true
+}</span>
+</pre>
+		
+		<pre class="file" id="file15" style="display: none">package process
+
+import (
+        "fmt"
+        "os"
+        "runtime"
+
+        "github.com/localrivet/gomcp/server"
+)
+
+// HandleKillProcess implements the kill_process tool using the new API
+func HandleKillProcess(ctx *server.Context, args KillProcessArgs) (string, error) <span class="cov0" title="0">{
+        ctx.Logger.Info("Handling kill_process tool call")
+
+        // TODO: Implement kill_process logic for Windows using taskkill
+        if runtime.GOOS == "windows" </span><span class="cov0" title="0">{
+                return "kill_process not fully implemented for Windows", nil
+        }</span>
+
+        // Find the process by PID
+        <span class="cov0" title="0">process, err := os.FindProcess(args.Pid)
+        if err != nil </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Error finding process", "pid", args.Pid, "error", err)
+                return fmt.Sprintf("Error finding process with PID %d: %v", args.Pid, err), err
+        }</span>
+
+        // Send a termination signal (SIGTERM)
+        <span class="cov0" title="0">if err := process.Signal(os.Interrupt); err != nil </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Error sending signal to process", "pid", args.Pid, "error", err)
+                return fmt.Sprintf("Error sending termination signal to process with PID %d: %v", args.Pid, err), err
+        }</span>
+
+        <span class="cov0" title="0">return fmt.Sprintf("Termination signal sent to process with PID %d.", args.Pid), nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file16" style="display: none">package process
+
+import (
+        "bytes"
+        "context"
+        "encoding/json"
+        "fmt"
+        "os/exec"
+        "runtime"
+        "strings"
+
+        "github.com/localrivet/gomcp/server"
+)
+
+// ProcessInfo represents information about a running process.
+type ProcessInfo struct {
+        PID     int    `json:"pid"`
+        Command string `json:"command"`
+        // Add other fields like CPU, Memory if parsing is enhanced
+}
+
+// HandleListProcesses implements the list_processes tool using the new API
+func HandleListProcesses(ctx *server.Context, args ListProcessesArgs) (string, error) <span class="cov0" title="0">{
+        ctx.Logger.Info("Handling list_processes tool call")
+
+        // TODO: Implement list_processes logic for Windows using tasklist
+        if runtime.GOOS == "windows" </span><span class="cov0" title="0">{
+                return "list_processes not fully implemented for Windows", nil
+        }</span>
+
+        // Implementation for Unix-like systems using 'ps aux'
+        <span class="cov0" title="0">cmd := exec.CommandContext(context.Background(), "ps", "aux")
+
+        var stdout, stderr bytes.Buffer
+        cmd.Stdout = &amp;stdout
+        cmd.Stderr = &amp;stderr
+
+        err := cmd.Run()
+        if err != nil </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Error executing 'ps aux'", "error", err, "stderr", stderr.String())
+                return "Error listing processes: " + err.Error() + "\n" + stderr.String(), err
+        }</span>
+
+        // Parse the output of 'ps aux'
+        <span class="cov0" title="0">lines := strings.Split(stdout.String(), "\n")
+        var processes []ProcessInfo
+        // Skip header line and empty lines
+        for i, line := range lines </span><span class="cov0" title="0">{
+                if i == 0 || strings.TrimSpace(line) == "" </span><span class="cov0" title="0">{
+                        continue</span>
+                }
+                <span class="cov0" title="0">fields := strings.Fields(line)
+                if len(fields) &lt; 11 </span><span class="cov0" title="0">{ // Basic check for expected number of fields in ps aux output
+                        ctx.Logger.Info("Skipping unexpected line format in ps aux output", "line", line)
+                        continue</span>
+                }
+
+                <span class="cov0" title="0">pid := 0
+                // Attempt to parse PID (usually the second field)
+                _, err := fmt.Sscan(fields[1], &amp;pid)
+                if err != nil </span><span class="cov0" title="0">{
+                        ctx.Logger.Info("Error parsing PID from line", "line", line, "error", err)
+                        continue</span> // Skip this line if PID cannot be parsed
+                }
+
+                // The command is typically the 11th field onwards
+                <span class="cov0" title="0">command := strings.Join(fields[10:], " ")
+
+                processes = append(processes, ProcessInfo{PID: pid, Command: command})</span>
+        }
+
+        // Marshal the process list into JSON
+        <span class="cov0" title="0">processesJson, marshalErr := json.MarshalIndent(processes, "", "  ")
+        if marshalErr != nil </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Error marshalling process list", "error", marshalErr)
+                return "Error generating process list output", marshalErr
+        }</span>
+
+        <span class="cov0" title="0">return string(processesJson), nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file17" style="display: none">package search
+
+import (
+        "bufio"
+        "context"
+        "fmt"
+        "io"
+        "os"
+        "path/filepath"
+        "regexp"
+        "runtime"
+        "sort"
+        "strings"
+        "sync"
+        "sync/atomic"
+        "time"
+
+        "github.com/localrivet/gomcp/server"
+)
+
+// Go structs for tool arguments
+type SearchCodeArgs struct {
+        Path          string  `json:"path" description:"The directory path to search within." required:"true"`
+        Pattern       string  `json:"pattern" description:"The text or regex pattern to search for." required:"true"`
+        FilePattern   *string `json:"filePattern,omitempty" description:"Optional glob pattern to filter files (e.g., '*.go')."`
+        IgnoreCase    *bool   `json:"ignoreCase,omitempty" description:"Perform case-insensitive search."`
+        MaxResults    *int    `json:"maxResults,omitempty" description:"Maximum number of results to return."`
+        IncludeHidden *bool   `json:"includeHidden,omitempty" description:"Include hidden files and directories in the search."`
+        ContextLines  *int    `json:"contextLines,omitempty" description:"Number of context lines to show around matches."`
+        TimeoutMs     *int    `json:"timeoutMs,omitempty" description:"Optional timeout in milliseconds for the search."`
+}
+
+// SearchMatch represents a single search match
+type SearchMatch struct {
+        File    string   `json:"file"`
+        Line    int      `json:"line"`
+        Column  int      `json:"column"`
+        Content string   `json:"content"`
+        Context []string `json:"context,omitempty"`
+}
+
+// SearchStats contains performance statistics
+type SearchStats struct {
+        Duration     time.Duration `json:"duration"`
+        FilesScanned int           `json:"files_scanned"`
+        BytesScanned int64         `json:"bytes_scanned"`
+        MatchesFound int           `json:"matches_found"`
+}
+
+// SearchResults contains all search results and metadata
+type SearchResults struct {
+        Matches []SearchMatch `json:"matches"`
+        Stats   SearchStats   `json:"stats"`
+}
+
+// Count returns the number of matches found
+func (r *SearchResults) Count() int <span class="cov8" title="1">{
+        return len(r.Matches)
+}</span>
+
+// HasMatches returns true if any matches were found
+func (r *SearchResults) HasMatches() bool <span class="cov8" title="1">{
+        return len(r.Matches) &gt; 0
+}</span>
+
+// Files returns a list of unique files that contain matches
+func (r *SearchResults) Files() []string <span class="cov8" title="1">{
+        fileSet := make(map[string]bool)
+        for _, match := range r.Matches </span><span class="cov8" title="1">{
+                fileSet[match.File] = true
+        }</span>
+
+        <span class="cov8" title="1">files := make([]string, 0, len(fileSet))
+        for file := range fileSet </span><span class="cov8" title="1">{
+                files = append(files, file)
+        }</span>
+        <span class="cov8" title="1">sort.Strings(files)
+        return files</span>
+}
+
+// SearchConfig holds configuration for the search engine
+type SearchConfig struct {
+        SearchPath      string
+        Pattern         string
+        MaxWorkers      int
+        BufferSize      int
+        MaxResults      int
+        UseOptimization bool
+        UseGitignore    bool
+        IgnoreCase      bool
+        FilePattern     string
+        ContextLines    int
+        IncludeHidden   bool
+        Timeout         time.Duration
+}
+
+// SearchOption is a functional option for configuring searches
+type SearchOption func(*SearchConfig)
+
+// WithIgnoreCase enables case-insensitive search
+func WithIgnoreCase() SearchOption <span class="cov8" title="1">{
+        return func(c *SearchConfig) </span><span class="cov8" title="1">{
+                c.IgnoreCase = true
+        }</span>
+}
+
+// WithContextLines sets the number of context lines around matches
+func WithContextLines(lines int) SearchOption <span class="cov8" title="1">{
+        return func(c *SearchConfig) </span><span class="cov8" title="1">{
+                c.ContextLines = lines
+        }</span>
+}
+
+// WithFilePattern sets a glob pattern to filter files
+func WithFilePattern(pattern string) SearchOption <span class="cov8" title="1">{
+        return func(c *SearchConfig) </span><span class="cov8" title="1">{
+                c.FilePattern = pattern
+        }</span>
+}
+
+// WithMaxResults limits the number of results returned
+func WithMaxResults(max int) SearchOption <span class="cov8" title="1">{
+        return func(c *SearchConfig) </span><span class="cov8" title="1">{
+                c.MaxResults = max
+        }</span>
+}
+
+// WithWorkers sets the number of worker goroutines
+func WithWorkers(workers int) SearchOption <span class="cov8" title="1">{
+        return func(c *SearchConfig) </span><span class="cov8" title="1">{
+                c.MaxWorkers = workers
+        }</span>
+}
+
+// WithHidden includes hidden files and directories
+func WithHidden() SearchOption <span class="cov0" title="0">{
+        return func(c *SearchConfig) </span><span class="cov0" title="0">{
+                c.IncludeHidden = true
+        }</span>
+}
+
+// WithTimeout sets a timeout for the search operation
+func WithTimeout(timeout time.Duration) SearchOption <span class="cov8" title="1">{
+        return func(c *SearchConfig) </span><span class="cov8" title="1">{
+                c.Timeout = timeout
+        }</span>
+}
+
+// WithGitignore enables respecting .gitignore files
+func WithGitignore(enabled bool) SearchOption <span class="cov0" title="0">{
+        return func(c *SearchConfig) </span><span class="cov0" title="0">{
+                c.UseGitignore = enabled
+        }</span>
+}
+
+// WithBufferSize sets the buffer size for file I/O
+func WithBufferSize(size int) SearchOption <span class="cov0" title="0">{
+        return func(c *SearchConfig) </span><span class="cov0" title="0">{
+                c.BufferSize = size
+        }</span>
+}
+
+// WithOptimization enables performance optimizations
+func WithOptimization(enabled bool) SearchOption <span class="cov8" title="1">{
+        return func(c *SearchConfig) </span><span class="cov8" title="1">{
+                c.UseOptimization = enabled
+        }</span>
+}
+
+// Find performs a search with the given pattern and options
+func Find(pattern, searchPath string, options ...SearchOption) (*SearchResults, error) <span class="cov8" title="1">{
+        config := &amp;SearchConfig{
+                SearchPath:      searchPath,
+                Pattern:         pattern,
+                MaxWorkers:      runtime.NumCPU(),
+                BufferSize:      64 * 1024,
+                MaxResults:      1000,
+                UseOptimization: true,
+                UseGitignore:    false,
+                IgnoreCase:      false,
+                ContextLines:    0,
+                IncludeHidden:   false,
+                Timeout:         0,
+        }
+
+        // Apply options
+        for _, option := range options </span><span class="cov8" title="1">{
+                option(config)
+        }</span>
+
+        <span class="cov8" title="1">engine := NewSearchEngine(*config)
+        ctx := context.Background()
+        if config.Timeout &gt; 0 </span><span class="cov8" title="1">{
+                var cancel context.CancelFunc
+                ctx, cancel = context.WithTimeout(ctx, config.Timeout)
+                defer cancel()
+        }</span>
+
+        <span class="cov8" title="1">return engine.Search(ctx, pattern)</span>
+}
+
+// SearchEngine provides fast text search functionality
+type SearchEngine struct {
+        config        SearchConfig
+        pattern       *regexp.Regexp
+        literalSearch string
+}
+
+// NewSearchEngine creates a new search engine with the given configuration
+func NewSearchEngine(config SearchConfig) *SearchEngine <span class="cov8" title="1">{
+        engine := &amp;SearchEngine{
+                config: config,
+        }
+
+        // Check if pattern is a simple literal string or regex
+        if isLiteralPattern(config.Pattern) </span><span class="cov8" title="1">{
+                // Use literal string search for better performance
+                if config.IgnoreCase </span><span class="cov8" title="1">{
+                        engine.literalSearch = strings.ToLower(config.Pattern)
+                }</span> else<span class="cov8" title="1"> {
+                        engine.literalSearch = config.Pattern
+                }</span>
+        } else<span class="cov8" title="1"> {
+                // Compile regex pattern
+                pattern := config.Pattern
+                if config.IgnoreCase </span><span class="cov0" title="0">{
+                        pattern = "(?i)" + pattern
+                }</span>
+
+                <span class="cov8" title="1">var err error
+                engine.pattern, err = regexp.Compile(pattern)
+                if err != nil </span><span class="cov0" title="0">{
+                        // Return engine with error state - will be caught in Search
+                        return engine
+                }</span>
+        }
+
+        <span class="cov8" title="1">return engine</span>
+}
+
+// Search performs the text search operation
+func (e *SearchEngine) Search(ctx context.Context, pattern string) (*SearchResults, error) <span class="cov8" title="1">{
+        startTime := time.Now()
+
+        // Validate pattern if using regex
+        if e.pattern == nil &amp;&amp; !isLiteralPattern(pattern) </span><span class="cov0" title="0">{
+                regexPattern := pattern
+                if e.config.IgnoreCase </span><span class="cov0" title="0">{
+                        regexPattern = "(?i)" + pattern
+                }</span>
+                <span class="cov0" title="0">var err error
+                e.pattern, err = regexp.Compile(regexPattern)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, fmt.Errorf("invalid regex pattern: %v", err)
+                }</span>
+        }
+
+        <span class="cov8" title="1">results := &amp;SearchResults{
+                Matches: make([]SearchMatch, 0),
+                Stats: SearchStats{
+                        FilesScanned: 0,
+                        BytesScanned: 0,
+                        MatchesFound: 0,
+                },
+        }
+
+        matchChan := make(chan SearchMatch, 1000)
+        var wg sync.WaitGroup
+        var resultCount int64
+        var filesScanned int64
+        var bytesScanned int64
+
+        // Use worker pool for concurrent file processing
+        filePaths := make(chan string, e.config.MaxWorkers*2)
+
+        // Start workers
+        for i := 0; i &lt; e.config.MaxWorkers; i++ </span><span class="cov8" title="1">{
+                wg.Add(1)
+                go func() </span><span class="cov8" title="1">{
+                        defer wg.Done()
+                        for filePath := range filePaths </span><span class="cov8" title="1">{
+                                select </span>{
+                                case &lt;-ctx.Done():<span class="cov0" title="0">
+                                        return</span>
+                                default:<span class="cov8" title="1"></span>
+                                }
+
+                                <span class="cov8" title="1">matches, fileBytes, err := e.searchFile(ctx, filePath, &amp;resultCount)
+                                if err != nil </span><span class="cov0" title="0">{
+                                        continue</span> // Skip files with errors
+                                }
+
+                                <span class="cov8" title="1">atomic.AddInt64(&amp;filesScanned, 1)
+                                atomic.AddInt64(&amp;bytesScanned, fileBytes)
+
+                                for _, match := range matches </span><span class="cov8" title="1">{
+                                        select </span>{
+                                        case matchChan &lt;- match:<span class="cov8" title="1">
+                                                atomic.AddInt64(&amp;resultCount, 1)</span>
+                                        case &lt;-ctx.Done():<span class="cov0" title="0">
+                                                return</span>
+                                        }
+
+                                        // Check max results limit
+                                        <span class="cov8" title="1">if e.config.MaxResults &gt; 0 &amp;&amp; int(resultCount) &gt;= e.config.MaxResults </span><span class="cov0" title="0">{
+                                                return
+                                        }</span>
+                                }
+                        }
+                }()
+        }
+
+        // Walk directory and send file paths to workers
+        <span class="cov8" title="1">go func() </span><span class="cov8" title="1">{
+                defer close(filePaths)
+
+                _ = filepath.Walk(e.config.SearchPath, func(path string, info os.FileInfo, err error) error </span><span class="cov8" title="1">{
+                        if err != nil </span><span class="cov0" title="0">{
+                                return nil // Skip files with errors
+                        }</span>
+
+                        <span class="cov8" title="1">select </span>{
+                        case &lt;-ctx.Done():<span class="cov8" title="1">
+                                return ctx.Err()</span>
+                        default:<span class="cov8" title="1"></span>
+                        }
+
+                        <span class="cov8" title="1">if e.shouldSkipFile(path, info) </span><span class="cov8" title="1">{
+                                if info.IsDir() &amp;&amp; !e.config.IncludeHidden &amp;&amp; strings.HasPrefix(info.Name(), ".") </span><span class="cov0" title="0">{
+                                        return filepath.SkipDir
+                                }</span>
+                                <span class="cov8" title="1">return nil</span>
+                        }
+
+                        <span class="cov8" title="1">select </span>{
+                        case filePaths &lt;- path:<span class="cov8" title="1"></span>
+                        case &lt;-ctx.Done():<span class="cov0" title="0">
+                                return ctx.Err()</span>
+                        }
+
+                        <span class="cov8" title="1">return nil</span>
+                })
+
+                // Walk completed - errors are handled individually during the walk
+        }()
+
+        // Wait for all workers to finish and close match channel
+        <span class="cov8" title="1">go func() </span><span class="cov8" title="1">{
+                wg.Wait()
+                close(matchChan)
+        }</span>()
+
+        // Collect results
+        <span class="cov8" title="1">for match := range matchChan </span><span class="cov8" title="1">{
+                results.Matches = append(results.Matches, match)
+                if e.config.MaxResults &gt; 0 &amp;&amp; len(results.Matches) &gt;= e.config.MaxResults </span><span class="cov0" title="0">{
+                        break</span>
+                }
+        }
+
+        // Sort results by file path and line number
+        <span class="cov8" title="1">sort.Slice(results.Matches, func(i, j int) bool </span><span class="cov8" title="1">{
+                if results.Matches[i].File == results.Matches[j].File </span><span class="cov8" title="1">{
+                        return results.Matches[i].Line &lt; results.Matches[j].Line
+                }</span>
+                <span class="cov8" title="1">return results.Matches[i].File &lt; results.Matches[j].File</span>
+        })
+
+        // Update statistics
+        <span class="cov8" title="1">results.Stats.Duration = time.Since(startTime)
+        results.Stats.FilesScanned = int(filesScanned)
+        results.Stats.BytesScanned = bytesScanned
+        results.Stats.MatchesFound = len(results.Matches)
+
+        return results, nil</span>
+}
+
+// searchFile searches for the pattern in a single file
+func (e *SearchEngine) searchFile(ctx context.Context, filePath string, resultCount *int64) ([]SearchMatch, int64, error) <span class="cov8" title="1">{
+        file, err := os.Open(filePath)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, 0, err
+        }</span>
+        <span class="cov8" title="1">defer file.Close()
+
+        var matches []SearchMatch
+        scanner := bufio.NewScanner(file)
+        lineNum := 1
+        var lines []string
+        var bytesRead int64
+
+        // Store lines for context if needed
+        if e.config.ContextLines &gt; 0 </span><span class="cov8" title="1">{
+                lines = make([]string, 0)
+        }</span>
+
+        <span class="cov8" title="1">for scanner.Scan() </span><span class="cov8" title="1">{
+                select </span>{
+                case &lt;-ctx.Done():<span class="cov0" title="0">
+                        return matches, bytesRead, ctx.Err()</span>
+                default:<span class="cov8" title="1"></span>
+                }
+
+                <span class="cov8" title="1">line := scanner.Text()
+                bytesRead += int64(len(line) + 1) // +1 for newline
+
+                if e.config.ContextLines &gt; 0 </span><span class="cov8" title="1">{
+                        lines = append(lines, line)
+                }</span>
+
+                <span class="cov8" title="1">var matched bool
+                var column int
+
+                if e.literalSearch != "" </span><span class="cov8" title="1">{
+                        // Literal string search
+                        searchLine := line
+                        if e.config.IgnoreCase </span><span class="cov8" title="1">{
+                                searchLine = strings.ToLower(line)
+                        }</span>
+                        <span class="cov8" title="1">if idx := strings.Index(searchLine, e.literalSearch); idx &gt;= 0 </span><span class="cov8" title="1">{
+                                matched = true
+                                column = idx + 1 // 1-indexed
+                        }</span>
+                } else<span class="cov8" title="1"> if e.pattern != nil </span><span class="cov8" title="1">{
+                        // Regex search
+                        if loc := e.pattern.FindStringIndex(line); loc != nil </span><span class="cov8" title="1">{
+                                matched = true
+                                column = loc[0] + 1 // 1-indexed
+                        }</span>
+                }
+
+                <span class="cov8" title="1">if matched </span><span class="cov8" title="1">{
+                        // Check if we've hit the max results limit
+                        if e.config.MaxResults &gt; 0 &amp;&amp; *resultCount &gt;= int64(e.config.MaxResults) </span><span class="cov0" title="0">{
+                                break</span>
+                        }
+
+                        <span class="cov8" title="1">match := SearchMatch{
+                                File:    filePath,
+                                Line:    lineNum,
+                                Column:  column,
+                                Content: line,
+                        }
+
+                        // Add context lines if requested
+                        if e.config.ContextLines &gt; 0 &amp;&amp; len(lines) &gt; 0 </span><span class="cov8" title="1">{
+                                start := max(0, len(lines)-e.config.ContextLines-1)
+                                end := min(len(lines)-1, len(lines)-1+e.config.ContextLines)
+
+                                for i := start; i &lt;= end; i++ </span><span class="cov8" title="1">{
+                                        if i != len(lines)-1 </span><span class="cov8" title="1">{ // Don't include the matched line itself
+                                                match.Context = append(match.Context, lines[i])
+                                        }</span>
+                                }
+                        }
+
+                        <span class="cov8" title="1">matches = append(matches, match)</span>
+                }
+
+                <span class="cov8" title="1">lineNum++</span>
+        }
+
+        <span class="cov8" title="1">return matches, bytesRead, scanner.Err()</span>
+}
+
+// shouldSkipFile determines if a file should be skipped based on various criteria
+func (e *SearchEngine) shouldSkipFile(path string, info os.FileInfo) bool <span class="cov8" title="1">{
+        // Skip directories
+        if info.IsDir() </span><span class="cov8" title="1">{
+                return true
+        }</span>
+
+        // Skip hidden files unless explicitly included
+        <span class="cov8" title="1">if !e.config.IncludeHidden &amp;&amp; strings.HasPrefix(info.Name(), ".") </span><span class="cov0" title="0">{
+                return true
+        }</span>
+
+        // Skip binary files (basic heuristic)
+        <span class="cov8" title="1">if isBinaryFile(path) </span><span class="cov0" title="0">{
+                return true
+        }</span>
+
+        // Check file pattern
+        <span class="cov8" title="1">if e.config.FilePattern != "" </span><span class="cov8" title="1">{
+                matched, _ := filepath.Match(e.config.FilePattern, info.Name())
+                if !matched </span><span class="cov8" title="1">{
+                        return true
+                }</span>
+        }
+
+        <span class="cov8" title="1">return false</span>
+}
+
+// isLiteralPattern checks if a pattern is a simple literal string
+func isLiteralPattern(pattern string) bool <span class="cov8" title="1">{
+        // Check for regex metacharacters
+        metaChars := []string{".", "*", "+", "?", "^", "$", "(", ")", "[", "]", "{", "}", "|", "\\"}
+        for _, char := range metaChars </span><span class="cov8" title="1">{
+                if strings.Contains(pattern, char) </span><span class="cov8" title="1">{
+                        return false
+                }</span>
+        }
+        <span class="cov8" title="1">return true</span>
+}
+
+// isBinaryFile performs a basic check to determine if a file is binary
+func isBinaryFile(path string) bool <span class="cov8" title="1">{
+        // Check file extension first
+        ext := strings.ToLower(filepath.Ext(path))
+        binaryExts := map[string]bool{
+                ".exe": true, ".dll": true, ".so": true, ".dylib": true,
+                ".bin": true, ".obj": true, ".o": true, ".a": true,
+                ".jpg": true, ".jpeg": true, ".png": true, ".gif": true,
+                ".pdf": true, ".zip": true, ".tar": true, ".gz": true,
+                ".mp3": true, ".mp4": true, ".avi": true, ".mov": true,
+        }
+        if binaryExts[ext] </span><span class="cov0" title="0">{
+                return true
+        }</span>
+
+        // Quick content check - read first 512 bytes and look for null bytes
+        <span class="cov8" title="1">file, err := os.Open(path)
+        if err != nil </span><span class="cov0" title="0">{
+                return true // Assume binary if we can't read it
+        }</span>
+        <span class="cov8" title="1">defer file.Close()
+
+        buffer := make([]byte, 512)
+        n, err := file.Read(buffer)
+        if err != nil &amp;&amp; err != io.EOF </span><span class="cov0" title="0">{
+                return true
+        }</span>
+
+        // Check for null bytes (common in binary files)
+        <span class="cov8" title="1">for i := 0; i &lt; n; i++ </span><span class="cov8" title="1">{
+                if buffer[i] == 0 </span><span class="cov0" title="0">{
+                        return true
+                }</span>
+        }
+
+        <span class="cov8" title="1">return false</span>
+}
+
+// Helper functions for min/max
+func max(a, b int) int <span class="cov8" title="1">{
+        if a &gt; b </span><span class="cov8" title="1">{
+                return a
+        }</span>
+        <span class="cov8" title="1">return b</span>
+}
+
+func min(a, b int) int <span class="cov8" title="1">{
+        if a &lt; b </span><span class="cov8" title="1">{
+                return a
+        }</span>
+        <span class="cov8" title="1">return b</span>
+}
+
+// HandleSearchCode implements the search_code tool using GoRipGrep API
+func HandleSearchCode(ctx *server.Context, args SearchCodeArgs) (string, error) <span class="cov8" title="1">{
+        ctx.Logger.Info("Handling search_code tool call with GoRipGrep implementation")
+
+        // Build options from args
+        var options []SearchOption
+
+        if args.IgnoreCase != nil &amp;&amp; *args.IgnoreCase </span><span class="cov8" title="1">{
+                options = append(options, WithIgnoreCase())
+        }</span>
+
+        <span class="cov8" title="1">if args.ContextLines != nil &amp;&amp; *args.ContextLines &gt; 0 </span><span class="cov8" title="1">{
+                options = append(options, WithContextLines(*args.ContextLines))
+        }</span>
+
+        <span class="cov8" title="1">if args.FilePattern != nil &amp;&amp; *args.FilePattern != "" </span><span class="cov8" title="1">{
+                options = append(options, WithFilePattern(*args.FilePattern))
+        }</span>
+
+        <span class="cov8" title="1">if args.MaxResults != nil &amp;&amp; *args.MaxResults &gt; 0 </span><span class="cov8" title="1">{
+                options = append(options, WithMaxResults(*args.MaxResults))
+        }</span>
+
+        <span class="cov8" title="1">if args.IncludeHidden != nil &amp;&amp; *args.IncludeHidden </span><span class="cov0" title="0">{
+                options = append(options, WithHidden())
+        }</span>
+
+        <span class="cov8" title="1">if args.TimeoutMs != nil &amp;&amp; *args.TimeoutMs &gt; 0 </span><span class="cov0" title="0">{
+                timeout := time.Duration(*args.TimeoutMs) * time.Millisecond
+                options = append(options, WithTimeout(timeout))
+        }</span>
+
+        // Perform search using GoRipGrep API
+        <span class="cov8" title="1">results, err := Find(args.Pattern, args.Path, options...)
+        if err != nil </span><span class="cov0" title="0">{
+                if err == context.DeadlineExceeded </span><span class="cov0" title="0">{
+                        ctx.Logger.Info("Search timed out", "pattern", args.Pattern)
+                        return "Search timed out.", nil
+                }</span>
+                <span class="cov0" title="0">ctx.Logger.Info("Error during search", "error", err, "pattern", args.Pattern)
+                return "", fmt.Errorf("search failed: %v", err)</span>
+        }
+
+        // Format results in ripgrep-like output format
+        <span class="cov8" title="1">if !results.HasMatches() </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Search completed with no matches", "pattern", args.Pattern)
+                return "", nil
+        }</span>
+
+        <span class="cov8" title="1">var output strings.Builder
+        for _, match := range results.Matches </span><span class="cov8" title="1">{
+                // Format: filename:line:content
+                output.WriteString(fmt.Sprintf("%s:%d:%s\n", match.File, match.Line, match.Content))
+
+                // Add context lines if available
+                if len(match.Context) &gt; 0 </span><span class="cov8" title="1">{
+                        for _, contextLine := range match.Context </span><span class="cov8" title="1">{
+                                output.WriteString(fmt.Sprintf("%s-%s\n", match.File, contextLine))
+                        }</span>
+                }
+        }
+
+        <span class="cov8" title="1">ctx.Logger.Info("Search completed successfully",
+                "pattern", args.Pattern,
+                "matches", results.Count(),
+                "files_scanned", results.Stats.FilesScanned,
+                "duration", results.Stats.Duration)
+
+        return strings.TrimSuffix(output.String(), "\n"), nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file18" style="display: none">package search
+
+import (
+        "context"
+        "encoding/json"
+        "fmt"
+        "os"
+        "path/filepath"
+        "regexp"
+        "strings"
+
+        "github.com/localrivet/gomcp/server"
+)
+
+// SearchFilesArgs defines the arguments for the search_files tool.
+type SearchFilesArgs struct {
+        Path        string `json:"path" description:"The path of the directory to search in." required:"true"`
+        Regex       string `json:"regex" description:"The regular expression pattern to search for." required:"true"`
+        FilePattern string `json:"file_pattern,omitempty" description:"Glob pattern to filter files (e.g., '*.ts'). If not provided, searches all files."`
+}
+
+// SearchResult represents a single match found during search.
+type SearchFilesResult struct {
+        FilePath string `json:"file_path"`
+        Line     int    `json:"line"`
+        Column   int    `json:"column"`
+        Match    string `json:"match"`
+        LineText string `json:"line_text"`
+        Context  string `json:"context"` // Surrounding lines for context
+}
+
+// HandleSearchFilesNew implements the search_files tool using the new API
+func HandleSearchFilesNew(ctx *server.Context, args SearchFilesArgs) (string, error) <span class="cov0" title="0">{
+        ctx.Logger.Info("Handling search_files tool call")
+
+        // Compile the regex
+        re, err := regexp.Compile(args.Regex)
+        if err != nil </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Error compiling regex", "regex", args.Regex, "error", err)
+                return "Error compiling regex: " + err.Error(), err
+        }</span>
+
+        <span class="cov0" title="0">var results []SearchFilesResult
+
+        // Walk the directory
+        err = filepath.Walk(args.Path, func(filePath string, info os.FileInfo, walkErr error) error </span><span class="cov0" title="0">{
+                if walkErr != nil </span><span class="cov0" title="0">{
+                        ctx.Logger.Info("Error walking path", "path", filePath, "error", walkErr)
+                        return walkErr // Continue walking other paths
+                }</span>
+
+                <span class="cov0" title="0">if !info.IsDir() </span><span class="cov0" title="0">{
+                        // Apply file pattern filter if provided
+                        if args.FilePattern != "" </span><span class="cov0" title="0">{
+                                matched, _ := filepath.Match(args.FilePattern, info.Name())
+                                if !matched </span><span class="cov0" title="0">{
+                                        return nil // Skip this file
+                                }</span>
+                        }
+
+                        // Read the file content
+                        <span class="cov0" title="0">contentBytes, readErr := os.ReadFile(filePath)
+                        if readErr != nil </span><span class="cov0" title="0">{
+                                ctx.Logger.Info("Error reading file for search", "filePath", filePath, "error", readErr)
+                                return nil // Skip this file, continue walking
+                        }</span>
+                        <span class="cov0" title="0">content := string(contentBytes)
+                        lines := strings.Split(content, "\n")
+
+                        // Search for matches line by line
+                        for i, line := range lines </span><span class="cov0" title="0">{
+                                matches := re.FindAllStringIndex(line, -1)
+                                for _, matchIndex := range matches </span><span class="cov0" title="0">{
+                                        start, end := matchIndex[0], matchIndex[1]
+                                        matchText := line[start:end]
+
+                                        // Get context (e.g., 2 lines before and after)
+                                        contextLines := []string{}
+                                        contextStart := max(0, i-2)
+                                        contextEnd := min(len(lines)-1, i+2)
+                                        for j := contextStart; j &lt;= contextEnd; j++ </span><span class="cov0" title="0">{
+                                                contextLines = append(contextLines, fmt.Sprintf("%d | %s", j+1, lines[j]))
+                                        }</span>
+                                        <span class="cov0" title="0">contextText := strings.Join(contextLines, "\n")
+
+                                        results = append(results, SearchFilesResult{
+                                                FilePath: filePath,
+                                                Line:     i + 1,     // 1-based line number
+                                                Column:   start + 1, // 1-based column number
+                                                Match:    matchText,
+                                                LineText: line,
+                                                Context:  contextText,
+                                        })</span>
+                                }
+                        }
+                }
+                <span class="cov0" title="0">return nil</span>
+        })
+
+        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Error during directory walk for search", "error", err)
+                return "Error during file search: " + err.Error(), err
+        }</span>
+
+        // Marshal the results into JSON
+        <span class="cov0" title="0">resultsJson, marshalErr := json.MarshalIndent(results, "", "  ")
+        if marshalErr != nil </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Error marshalling search results", "error", marshalErr)
+                return "Error generating search results output", marshalErr
+        }</span>
+
+        <span class="cov0" title="0">return string(resultsJson), nil</span>
+}
+
+// Legacy handler - keeping for backward compatibility but not used with new API
+func HandleSearchFiles(ctx context.Context, progressToken interface{}, arguments any) ([]interface{}, bool) <span class="cov0" title="0">{
+        // Legacy implementation - not used with new API
+        return []interface{}{"Legacy handler not implemented"}, true
+}</span>
+</pre>
+		
+		<pre class="file" id="file19" style="display: none">package terminal
+
+import (
+        "encoding/json"
+
+        "github.com/localrivet/gomcp/server"
+)
+
+// ExecuteInTerminalArgs defines the arguments for the execute_in_terminal tool.
+type ExecuteInTerminalArgs struct {
+        Command string `json:"command" description:"The command to execute in the terminal." required:"true"`
+        Cwd     string `json:"cwd,omitempty" description:"The working directory for the terminal. Defaults to the server's current working directory."`
+}
+
+// HandleExecuteInTerminal implements the logic for the execute_in_terminal tool.
+func HandleExecuteInTerminal(ctx *server.Context, args ExecuteInTerminalArgs) (string, error) <span class="cov0" title="0">{
+        ctx.Logger.Info("Handling execute_in_terminal tool call")
+
+        // This handler signals the client to execute the command in a terminal.
+        // The actual execution happens client-side.
+        // We return a JSON response with terminal execution instructions.
+        response := map[string]interface{}{
+                "type":    "terminal",
+                "command": args.Command,
+                "cwd":     args.Cwd,
+                "message": "Terminal execution requested",
+        }
+
+        responseJSON, err := json.Marshal(response)
+        if err != nil </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Error marshalling terminal response", "error", err)
+                return "", err
+        }</span>
+
+        <span class="cov0" title="0">return string(responseJSON), nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file20" style="display: none">package terminal
+
+import (
+        "bytes"
+        "fmt"
+        "os"
+        "os/exec"
+        "sync"
+        "time"
+
+        "github.com/localrivet/gomcp/server"
+)
+
+// TerminalSession holds information about a running command process.
+type TerminalSession struct {
+        PID       int
+        Cmd       *exec.Cmd
+        StartTime time.Time
+        Stdout    bytes.Buffer // Buffer to capture stdout
+        Stderr    bytes.Buffer // Buffer to capture stderr
+        Done      chan error   // Channel to signal completion
+        // TODO: Consider adding command string, shell used, etc. if needed for list_sessions
+}
+
+// TerminalManager manages active terminal sessions.
+type TerminalManager struct {
+        mu       sync.Mutex // Mutex to protect concurrent access to sessions map
+        sessions map[int]*TerminalSession
+        // TODO: Consider adding completed sessions tracking if needed
+}
+
+// Global instance of the TerminalManager
+var globalTerminalManager *TerminalManager
+var once sync.Once
+
+// GetManager returns the singleton instance of the TerminalManager.
+func GetManager() *TerminalManager <span class="cov0" title="0">{
+        once.Do(func() </span><span class="cov0" title="0">{
+                globalTerminalManager = &amp;TerminalManager{
+                        sessions: make(map[int]*TerminalSession),
+                }
+                // TODO: Add any background cleanup routines if needed (e.g., for old completed sessions)
+        }</span>)
+        <span class="cov0" title="0">return globalTerminalManager</span>
+}
+
+// AddSession adds a new session to the manager.
+func (tm *TerminalManager) AddSession(pid int, session *TerminalSession) <span class="cov0" title="0">{
+        tm.mu.Lock()
+        defer tm.mu.Unlock()
+        tm.sessions[pid] = session
+}</span>
+
+// GetSession retrieves a session by PID.
+func (tm *TerminalManager) GetSession(pid int) (*TerminalSession, bool) <span class="cov0" title="0">{
+        tm.mu.Lock()
+        defer tm.mu.Unlock()
+        session, exists := tm.sessions[pid]
+        return session, exists
+}</span>
+
+// RemoveSession removes a session by PID.
+func (tm *TerminalManager) RemoveSession(pid int) <span class="cov0" title="0">{
+        tm.mu.Lock()
+        defer tm.mu.Unlock()
+        delete(tm.sessions, pid)
+        // TODO: Potentially add session to a completed list here
+}</span>
+
+// StartCommand starts a command asynchronously and manages its session.
+// Returns PID and error (nil if start was successful).
+func (tm *TerminalManager) StartCommand(ctx *server.Context, commandStr string, shell string, executeFlag string) (int, error) <span class="cov0" title="0">{
+        cmd := exec.Command(shell, executeFlag, commandStr)
+
+        session := &amp;TerminalSession{
+                Cmd:       cmd,
+                StartTime: time.Now(),
+                Done:      make(chan error, 1), // Buffered channel
+        }
+
+        // Assign buffers for stdout and stderr capture
+        cmd.Stdout = &amp;session.Stdout
+        cmd.Stderr = &amp;session.Stderr
+
+        // Start the command asynchronously
+        err := cmd.Start()
+        if err != nil </span><span class="cov0" title="0">{
+                return -1, err // Failed to start
+        }</span>
+
+        <span class="cov0" title="0">session.PID = cmd.Process.Pid
+        tm.AddSession(session.PID, session)
+
+        ctx.Logger.Info("Started command", "pid", session.PID, "command", commandStr)
+
+        // Start a goroutine to wait for the command to finish
+        go func() </span><span class="cov0" title="0">{
+                err := cmd.Wait()
+                session.Done &lt;- err // Send completion error (or nil) to the channel
+                close(session.Done) // Close channel to signal completion fully
+
+                ctx.Logger.Info("Command finished", "pid", session.PID, "error", err)
+
+                // Clean up the session from the active map
+                // TODO: Consider moving completed session info elsewhere before removing
+                tm.RemoveSession(session.PID)
+        }</span>()
+
+        <span class="cov0" title="0">return session.PID, nil</span> // Return PID and nil error indicating successful start
+}
+
+// ReadNewOutput retrieves any output captured since the last call for a given PID.
+// It clears the internal buffer after reading.
+func (tm *TerminalManager) ReadNewOutput(pid int) (string, error) <span class="cov0" title="0">{
+        tm.mu.Lock()
+        defer tm.mu.Unlock()
+
+        session, exists := tm.sessions[pid]
+        if !exists </span><span class="cov0" title="0">{
+                // TODO: Check completed sessions here?
+                return "", fmt.Errorf("session with PID %d not found or already completed", pid)
+        }</span>
+
+        // Read directly from the session's buffers
+        // Note: This might not be perfectly synchronized if the process writes rapidly
+        // between reads, but it captures what's available.
+        // A more robust solution might involve dedicated goroutines reading streams.
+
+        <span class="cov0" title="0">stdoutBytes := session.Stdout.Bytes()
+        stderrBytes := session.Stderr.Bytes()
+
+        // Reset buffers after reading
+        session.Stdout.Reset()
+        session.Stderr.Reset()
+
+        output := string(stdoutBytes) + string(stderrBytes)
+
+        return output, nil</span>
+}
+
+// TerminateSession attempts to terminate the process associated with the given PID.
+// It first tries SIGINT, then SIGKILL if necessary.
+func (tm *TerminalManager) TerminateSession(ctx *server.Context, pid int) error <span class="cov0" title="0">{
+        tm.mu.Lock()
+        // Unlock happens within the function to allow process killing which might block briefly
+
+        session, exists := tm.sessions[pid]
+        if !exists </span><span class="cov0" title="0">{
+                tm.mu.Unlock()
+                // TODO: Check completed sessions? Maybe return a specific "already completed" error?
+                return fmt.Errorf("session with PID %d not found or already completed", pid)
+        }</span>
+
+        // Get the process
+        <span class="cov0" title="0">process := session.Cmd.Process
+        if process == nil </span><span class="cov0" title="0">{
+                // Should not happen if session exists, but check anyway
+                tm.mu.Unlock()
+                // Remove the session as it's invalid
+                delete(tm.sessions, pid)
+                return fmt.Errorf("process not found for session PID %d", pid)
+        }</span>
+        <span class="cov0" title="0">tm.mu.Unlock() // Unlock before potentially blocking kill operations
+
+        ctx.Logger.Info("Attempting to terminate process", "pid", pid)
+
+        // Try SIGINT first (graceful shutdown) - platform dependent
+        err := process.Signal(os.Interrupt)
+        if err != nil </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Failed to send SIGINT", "pid", pid, "error", err)
+                // If SIGINT fails or isn't supported, try SIGKILL (forceful)
+                err = process.Kill()
+                if err != nil </span><span class="cov0" title="0">{
+                        ctx.Logger.Info("Failed to send SIGKILL", "pid", pid, "error", err)
+                        // Even if kill fails, the process might have exited already.
+                        // The background goroutine in StartCommand should handle cleanup.
+                        return fmt.Errorf("failed to terminate process PID %d: %w", pid, err)
+                }</span>
+        }
+
+        // SIGINT sent successfully - process should terminate gracefully
+        // The background goroutine in StartCommand will handle cleanup when cmd.Wait() returns
+        // Note: The session is removed from the map by the goroutine in StartCommand when cmd.Wait() returns.
+        // We don't remove it here directly.
+        <span class="cov0" title="0">ctx.Logger.Info("Termination signal sent", "pid", pid)
+        return nil</span> // Signal sent successfully (doesn't guarantee process exited immediately)
+}
+
+// ActiveSessionInfo provides basic info about a running session.
+type ActiveSessionInfo struct {
+        PID       int    `json:"pid"`
+        StartTime string `json:"startTime"`
+        RuntimeMs int64  `json:"runtimeMs"`
+        // TODO: Add Command string if stored in TerminalSession
+}
+
+// ListActiveSessions returns information about currently running sessions.
+func (tm *TerminalManager) ListActiveSessions() []ActiveSessionInfo <span class="cov0" title="0">{
+        tm.mu.Lock()
+        defer tm.mu.Unlock()
+
+        now := time.Now()
+        active := make([]ActiveSessionInfo, 0, len(tm.sessions))
+
+        for pid, session := range tm.sessions </span><span class="cov0" title="0">{
+                active = append(active, ActiveSessionInfo{
+                        PID:       pid,
+                        StartTime: session.StartTime.Format(time.RFC3339),
+                        RuntimeMs: now.Sub(session.StartTime).Milliseconds(),
+                })
+        }</span>
+        <span class="cov0" title="0">return active</span>
+}
+</pre>
+		
+		<pre class="file" id="file21" style="display: none">package terminal
+
+import (
+        "encoding/json"
+        "fmt"
+        "os"
+        "os/exec"
+        "path/filepath"
+        "runtime"
+        "strings"
+
+        "gocreate/tools/config"
+
+        "github.com/localrivet/gomcp/server"
+        "mvdan.cc/sh/syntax"
+)
+
+// Go structs for tool arguments
+type ExecuteCommandArgs struct {
+        Command       string  `json:"command" description:"The command to execute." required:"true"`
+        TimeoutMs     *int    `json:"timeout_ms,omitempty" description:"Optional timeout in milliseconds."`
+        Shell         *string `json:"shell,omitempty" description:"Optional shell to use (e.g., /bin/bash, powershell.exe, cmd.exe). Defaults to best available shell."`
+        UsePowerShell *bool   `json:"use_powershell,omitempty" description:"If true and on Windows, prefer PowerShell over cmd.exe. Ignored on non-Windows systems."`
+}
+
+type ReadOutputArgs struct {
+        Pid int `json:"pid" description:"The PID of the terminal session to read output from." required:"true"`
+}
+
+type ForceTerminateArgs struct {
+        Pid int `json:"pid" description:"The PID of the terminal session to force terminate." required:"true"`
+}
+
+type ListSessionsArgs struct{}
+
+// detectBestShell determines the best available shell for the current system
+func detectBestShell(preferPowerShell bool) string <span class="cov0" title="0">{
+        if runtime.GOOS == "windows" </span><span class="cov0" title="0">{
+                // Check for PowerShell if preferred
+                if preferPowerShell </span><span class="cov0" title="0">{
+                        // Try PowerShell Core (pwsh.exe) first
+                        if pwshPath, err := exec.LookPath("pwsh.exe"); err == nil </span><span class="cov0" title="0">{
+                                return pwshPath
+                        }</span>
+                        // Fall back to Windows PowerShell
+                        <span class="cov0" title="0">if powershellPath, err := exec.LookPath("powershell.exe"); err == nil </span><span class="cov0" title="0">{
+                                return powershellPath
+                        }</span>
+                }
+                // Fall back to cmd.exe
+                <span class="cov0" title="0">return "cmd.exe"</span>
+        }
+
+        // For Unix-like systems, try to find the user's preferred shell
+        <span class="cov0" title="0">if shellEnv := os.Getenv("SHELL"); shellEnv != "" </span><span class="cov0" title="0">{
+                return shellEnv
+        }</span>
+
+        // Check common Unix shells in order of preference
+        <span class="cov0" title="0">shells := []string{"/bin/bash", "/bin/zsh", "/bin/sh"}
+        for _, shell := range shells </span><span class="cov0" title="0">{
+                if _, err := os.Stat(shell); err == nil </span><span class="cov0" title="0">{
+                        return shell
+                }</span>
+        }
+
+        // Final fallback to /bin/sh which should always exist on Unix systems
+        <span class="cov0" title="0">return "/bin/sh"</span>
+}
+
+// getShellExecuteFlag returns the appropriate flag to execute commands based on shell type
+func getShellExecuteFlag(shell string) string <span class="cov0" title="0">{
+        shell = filepath.Base(shell)
+        switch shell </span>{
+        case "powershell.exe", "pwsh.exe":<span class="cov0" title="0">
+                return "-Command"</span>
+        case "cmd.exe":<span class="cov0" title="0">
+                return "/C"</span>
+        default:<span class="cov0" title="0">
+                return "-c"</span>
+        }
+}
+
+// isCommandBlockedComplex checks if any command within a potentially complex shell string is blocked using AST parsing.
+func isCommandBlockedComplex(ctx *server.Context, commandStr string, blockedCommands []string) (bool, string) <span class="cov0" title="0">{
+        if len(blockedCommands) == 0 </span><span class="cov0" title="0">{
+                return false, "" // No commands are blocked
+        }</span>
+
+        // Create a map for faster lookup
+        <span class="cov0" title="0">blockedSet := make(map[string]struct{}, len(blockedCommands))
+        for _, cmd := range blockedCommands </span><span class="cov0" title="0">{
+                blockedSet[cmd] = struct{}{}
+        }</span>
+
+        // Parse the command string
+        <span class="cov0" title="0">parser := syntax.NewParser()
+        reader := strings.NewReader(commandStr)
+        file, err := parser.Parse(reader, "")
+        if err != nil </span><span class="cov0" title="0">{
+                // If parsing fails, block execution as the command is ambiguous or invalid
+                ctx.Logger.Info("Error parsing command string for validation. Blocking execution.", "error", err)
+                return true, fmt.Sprintf("invalid syntax: %v", err)
+        }</span>
+
+        <span class="cov0" title="0">var firstBlocked string
+        blocked := false
+
+        // Walk the AST to find command calls
+        syntax.Walk(file, func(node syntax.Node) bool </span><span class="cov0" title="0">{
+                if blocked </span><span class="cov0" title="0">{ // Stop walking if we already found a blocked command
+                        return false
+                }</span>
+                <span class="cov0" title="0">if cmd, ok := node.(*syntax.CallExpr); ok </span><span class="cov0" title="0">{
+                        if len(cmd.Args) &gt; 0 </span><span class="cov0" title="0">{
+                                // Attempt to evaluate the first argument (command name) to a string
+                                // This handles simple cases, quotes, and potentially some expansions.
+                                // More complex cases (variables, command substitutions) might require an interpreter.
+                                // Using WordParts is more direct for simple literals.
+                                var cmdName string
+                                if len(cmd.Args[0].Parts) == 1 </span><span class="cov0" title="0">{
+                                        switch part := cmd.Args[0].Parts[0].(type) </span>{
+                                        case *syntax.Lit:<span class="cov0" title="0">
+                                                cmdName = part.Value</span>
+                                        case *syntax.SglQuoted:<span class="cov0" title="0">
+                                                cmdName = part.Value</span>
+                                        case *syntax.DblQuoted:<span class="cov0" title="0">
+                                                // Only check if it contains simple literals inside
+                                                if len(part.Parts) == 1 </span><span class="cov0" title="0">{
+                                                        if lit, ok := part.Parts[0].(*syntax.Lit); ok </span><span class="cov0" title="0">{
+                                                                cmdName = lit.Value
+                                                        }</span>
+                                                }
+                                        }
+                                }
+
+                                <span class="cov0" title="0">if cmdName != "" </span><span class="cov0" title="0">{
+                                        cmdNameLower := strings.ToLower(cmdName)
+                                        if _, isBlocked := blockedSet[cmdNameLower]; isBlocked </span><span class="cov0" title="0">{
+                                                ctx.Logger.Info("Command validation failed: Found blocked command", "command", cmdName, "commandStr", commandStr)
+                                                firstBlocked = cmdName // Return the original case name
+                                                blocked = true
+                                                return false // Stop walking
+                                        }</span>
+                                } else<span class="cov0" title="0"> {
+                                        // Log if we encounter a command name we can't easily resolve to a literal
+                                        var sb strings.Builder
+                                        syntax.DebugPrint(&amp;sb, cmd.Args[0])
+                                        ctx.Logger.Info("Warning: Could not resolve command name to simple literal for validation", "debug", sb.String())
+                                }</span>
+                        }
+                }
+                <span class="cov0" title="0">return true</span> // Continue walking
+        })
+
+        <span class="cov0" title="0">return blocked, firstBlocked</span>
+}
+
+// New API handlers that return strings instead of protocol.Content
+
+// HandleExecuteCommand implements the execute_command tool using the new API
+func HandleExecuteCommand(ctx *server.Context, args ExecuteCommandArgs) (string, error) <span class="cov0" title="0">{
+        ctx.Logger.Info("Handling execute_command tool call")
+
+        // Determine shell preference
+        usePowerShell := false
+        if args.UsePowerShell != nil </span><span class="cov0" title="0">{
+                usePowerShell = *args.UsePowerShell
+        }</span>
+
+        // Get shell path
+        <span class="cov0" title="0">shellPath := ""
+        if args.Shell != nil &amp;&amp; *args.Shell != "" </span><span class="cov0" title="0">{
+                shellPath = *args.Shell
+        }</span> else<span class="cov0" title="0"> {
+                shellPath = detectBestShell(usePowerShell)
+        }</span>
+
+        // --- Command Validation ---
+        <span class="cov0" title="0">cfg, err := config.GetCurrentConfig(ctx) // Get loaded config
+        if err != nil </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Error loading config for command validation", "error", err)
+                return "Error loading configuration for validation", err
+        }</span>
+
+        // Use the complex validation function
+        <span class="cov0" title="0">blocked, blockedCmdName := isCommandBlockedComplex(ctx, args.Command, cfg.BlockedCommands)
+        if blocked </span><span class="cov0" title="0">{
+                errMsg := fmt.Sprintf("Command execution blocked: Command '%s' is blocked or syntax is invalid/unsupported for validation.", blockedCmdName)
+                ctx.Logger.Info("Command blocked", "error", errMsg)
+                return errMsg, nil
+        }</span>
+        // --- End Command Validation ---
+
+        // Get the appropriate execute flag for the shell
+        <span class="cov0" title="0">executeFlag := getShellExecuteFlag(shellPath)
+
+        // Get the terminal manager instance
+        tm := GetManager()
+
+        // Start the command asynchronously using the manager
+        pid, startErr := tm.StartCommand(ctx, args.Command, shellPath, executeFlag)
+
+        // Check for errors during start
+        if startErr != nil </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Error starting command", "command", args.Command, "shell", shellPath, "error", startErr)
+                // Attempt to provide more specific error message if possible
+                errMsg := fmt.Sprintf("Error starting command: %v", startErr)
+                // Check if it's a 'command not found' type error
+                if exitErr, ok := startErr.(*exec.ExitError); ok </span><span class="cov0" title="0">{
+                        errMsg = fmt.Sprintf("Error starting command: %v. Stderr: %s", startErr, string(exitErr.Stderr))
+                }</span> else<span class="cov0" title="0"> if pathErr, ok := startErr.(*exec.Error); ok </span><span class="cov0" title="0">{
+                        if pathErr.Err == exec.ErrNotFound </span><span class="cov0" title="0">{
+                                errMsg = fmt.Sprintf("Error starting command: Shell or command not found: %v", startErr)
+                        }</span>
+                }
+                <span class="cov0" title="0">return errMsg, startErr</span>
+        }
+
+        // Return PID indicating successful start
+        <span class="cov0" title="0">ctx.Logger.Info("Command started successfully in background", "pid", pid, "shell", shellPath, "command", args.Command)
+        resultText := fmt.Sprintf("Command started in background with PID: %d", pid)
+        return resultText, nil</span>
+}
+
+// HandleReadOutput implements the read_output tool using the new API
+func HandleReadOutput(ctx *server.Context, args ReadOutputArgs) (string, error) <span class="cov0" title="0">{
+        ctx.Logger.Info("Handling read_output tool call")
+
+        // Get the terminal manager instance
+        tm := GetManager()
+
+        // Read new output from the manager
+        output, err := tm.ReadNewOutput(args.Pid)
+        if err != nil </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Error reading output", "pid", args.Pid, "error", err)
+                return err.Error(), err
+        }</span>
+
+        <span class="cov0" title="0">ctx.Logger.Info("Read output", "pid", args.Pid, "bytes", len(output))
+        return output, nil</span>
+}
+
+// HandleForceTerminate implements the force_terminate tool using the new API
+func HandleForceTerminate(ctx *server.Context, args ForceTerminateArgs) (string, error) <span class="cov0" title="0">{
+        ctx.Logger.Info("Handling force_terminate tool call")
+
+        // Get the terminal manager instance
+        tm := GetManager()
+
+        // Terminate the session using the manager
+        err := tm.TerminateSession(ctx, args.Pid)
+        if err != nil </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Error terminating process", "pid", args.Pid, "error", err)
+                return err.Error(), err
+        }</span>
+
+        <span class="cov0" title="0">ctx.Logger.Info("Termination signal sent", "pid", args.Pid)
+        resultText := fmt.Sprintf("Termination signal sent to PID %d.", args.Pid)
+        return resultText, nil</span>
+}
+
+// HandleListSessions implements the list_sessions tool using the new API
+func HandleListSessions(ctx *server.Context, args ListSessionsArgs) (string, error) <span class="cov0" title="0">{
+        ctx.Logger.Info("Handling list_sessions tool call")
+
+        // Get the terminal manager instance
+        tm := GetManager()
+
+        // Get the list of active sessions
+        activeSessions := tm.ListActiveSessions()
+
+        // Marshal the result to JSON
+        resultJson, err := json.MarshalIndent(activeSessions, "", "  ")
+        if err != nil </span><span class="cov0" title="0">{
+                ctx.Logger.Info("Error marshalling active sessions", "error", err)
+                return "Error formatting session list", err
+        }</span>
+
+        <span class="cov0" title="0">ctx.Logger.Info("Found active sessions", "count", len(activeSessions))
+        return string(resultJson), nil</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

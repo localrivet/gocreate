@@ -59,7 +59,7 @@ func main() {
 	s.Tool("get_file_info", "Retrieve detailed metadata about a file or directory.",
 		filesystem.HandleGetFileInfo)
 
-	s.Tool("search_code", "Search for text/code patterns within file contents using ripgrep.",
+	s.Tool("search_code", "Search for text/code patterns within file contents using pure Go implementation.",
 		search.HandleSearchCode)
 
 	s.Tool("edit_block", "Apply surgical text replacements to files.",

@@ -20,7 +20,7 @@ type SearchFilesArgs struct {
 }
 
 // SearchResult represents a single match found during search.
-type SearchResult struct {
+type SearchFilesResult struct {
 	FilePath string `json:"file_path"`
 	Line     int    `json:"line"`
 	Column   int    `json:"column"`
@@ -40,7 +40,7 @@ func HandleSearchFilesNew(ctx *server.Context, args SearchFilesArgs) (string, er
 		return "Error compiling regex: " + err.Error(), err
 	}
 
-	var results []SearchResult
+	var results []SearchFilesResult
 
 	// Walk the directory
 	err = filepath.Walk(args.Path, func(filePath string, info os.FileInfo, walkErr error) error {
@@ -83,7 +83,7 @@ func HandleSearchFilesNew(ctx *server.Context, args SearchFilesArgs) (string, er
 					}
 					contextText := strings.Join(contextLines, "\n")
 
-					results = append(results, SearchResult{
+					results = append(results, SearchFilesResult{
 						FilePath: filePath,
 						Line:     i + 1,     // 1-based line number
 						Column:   start + 1, // 1-based column number
@@ -110,22 +110,6 @@ func HandleSearchFilesNew(ctx *server.Context, args SearchFilesArgs) (string, er
 	}
 
 	return string(resultsJson), nil
-}
-
-// Helper function to find the maximum of two integers
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
-// Helper function to find the minimum of two integers
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
 }
 
 // Legacy handler - keeping for backward compatibility but not used with new API

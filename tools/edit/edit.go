@@ -86,9 +86,9 @@ func HandleEditBlock(ctx *server.Context, args EditBlockArgs) (string, error) {
 
 			// --- Generate Diff for Near Miss ---
 			dmp := diffmatchpatch.New()
-			errorMsg := "Failed to apply edit. Old string block not found."
 			bestMatchIndex := dmp.MatchMain(originalContent, args.OldString, 0)
 
+			var errorMsg string
 			if bestMatchIndex != -1 {
 				// Found a potential near miss location
 				endIndex := bestMatchIndex + len(args.OldString)

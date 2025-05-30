@@ -13,13 +13,12 @@ import (
 
 // TerminalSession holds information about a running command process.
 type TerminalSession struct {
-	PID        int
-	Cmd        *exec.Cmd
-	StartTime  time.Time
-	Stdout     bytes.Buffer // Buffer to capture stdout
-	Stderr     bytes.Buffer // Buffer to capture stderr
-	Done       chan error   // Channel to signal completion
-	lastOutput string       // Stores output read since last check (for read_output)
+	PID       int
+	Cmd       *exec.Cmd
+	StartTime time.Time
+	Stdout    bytes.Buffer // Buffer to capture stdout
+	Stderr    bytes.Buffer // Buffer to capture stderr
+	Done      chan error   // Channel to signal completion
 	// TODO: Consider adding command string, shell used, etc. if needed for list_sessions
 }
 
@@ -177,18 +176,10 @@ func (tm *TerminalManager) TerminateSession(ctx *server.Context, pid int) error 
 			// The background goroutine in StartCommand should handle cleanup.
 			return fmt.Errorf("failed to terminate process PID %d: %w", pid, err)
 		}
-	} else {
-		// Optional: Wait a short duration to see if SIGINT worked before potentially trying SIGKILL
-		// time.Sleep(500 * time.Millisecond)
-		// tm.mu.Lock()
-		// _, stillExists := tm.sessions[pid]
-		// tm.mu.Unlock()
-		// if stillExists {
-		//    log.Printf("Process %d did not exit after SIGINT, attempting SIGKILL.", pid)
-		//    process.Kill() // Ignore error here, best effort
-		// }
 	}
 
+	// SIGINT sent successfully - process should terminate gracefully
+	// The background goroutine in StartCommand will handle cleanup when cmd.Wait() returns
 	// Note: The session is removed from the map by the goroutine in StartCommand when cmd.Wait() returns.
 	// We don't remove it here directly.
 	ctx.Logger.Info("Termination signal sent", "pid", pid)
