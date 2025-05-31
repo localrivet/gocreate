@@ -5,7 +5,7 @@ go 1.24.0
 toolchain go1.24.2
 
 require (
-	github.com/localrivet/gomcp v1.2.2
+	github.com/localrivet/gomcp v1.5.2
 	github.com/sergi/go-diff v1.3.1
 	mvdan.cc/sh v2.6.4+incompatible
 )
